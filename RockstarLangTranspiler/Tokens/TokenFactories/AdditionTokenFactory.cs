@@ -7,7 +7,6 @@ namespace RockstarLangTranspiler.Tokens.TokenFactories
 {
     public class AdditionTokenFactory : TokenFactory
     {
-
         private static string[] _keyWords = { "plus", "with" };
         public override IReadOnlyCollection<string> KeyWords => _keyWords;
 

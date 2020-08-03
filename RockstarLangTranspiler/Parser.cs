@@ -42,6 +42,7 @@ namespace RockstarLangTranspiler
             {
                 NumberToken number => (new ConstantExpression(float.Parse(number.Value)), currentTokenPosition + 1),
                 AdditionToken _ => CreateAdditionExpression(currentTokenPosition),
+                OutputToken _ => CreateOutputExpression(currentTokenPosition),
                 _ => throw new ArgumentException(),
             };
 
@@ -50,6 +51,12 @@ namespace RockstarLangTranspiler
                 return (new AdditionExpression(CreateExpressionBranch(currentTokenPosition - 1).expression, 
                     CreateExpressionBranch(currentTokenPosition + 1).expression),
                     currentTokenPosition + 2);
+            }
+
+            (OutputExpression, int) CreateOutputExpression(int currentTokenPosition)
+            {
+                var nextExpression = CreateExpressionBranch(currentTokenPosition + 1);
+                return (new OutputExpression(nextExpression.expression), nextExpression.nextTokenPosition);
             }
         }
     }
