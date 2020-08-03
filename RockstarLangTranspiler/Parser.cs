@@ -19,9 +19,12 @@ namespace RockstarLangTranspiler
         public SyntaxTree Parse()
         {
             var rootExpressions = new List<IExpression>();
-            for (int current = 0; current < _tokens.Length; current++)
+            int current = 0;
+            while(current < _tokens.Length)
             {
                 var (expression, position) = CreateExpressionBranch(current);
+                if (expression is null)
+                    break;
                 rootExpressions.Add(expression);
                 current = position;
             }
@@ -31,7 +34,23 @@ namespace RockstarLangTranspiler
 
         private (IExpression expression, int nextTokenPosition) CreateExpressionBranch(int currentTokenPosition)
         {
-            throw new NotImplementedException();
+            if (currentTokenPosition < 0 || currentTokenPosition > _tokens.Length)
+                return (null, -1);
+            var token = _tokens[currentTokenPosition];
+
+            return token switch
+            {
+                NumberToken number => (new ConstantExpression(float.Parse(number.Value)), currentTokenPosition + 1),
+                AdditionToken _ => CreateAdditionExpression(currentTokenPosition),
+                _ => throw new ArgumentException(),
+            };
+
+            (AdditionExpression, int) CreateAdditionExpression(int currentTokenPosition)
+            {
+                return (new AdditionExpression(CreateExpressionBranch(currentTokenPosition - 1).expression, 
+                    CreateExpressionBranch(currentTokenPosition + 1).expression),
+                    currentTokenPosition + 2);
+            }
         }
     }
 }

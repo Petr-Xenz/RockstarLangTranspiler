@@ -6,7 +6,7 @@ namespace RockstarLangTranspiler
 {
     public class SyntaxTree
     {
-        public IEnumerable<IExpression> RootExpressions;
+        public IEnumerable<IExpression> RootExpressions { get; }
 
         public SyntaxTree(IEnumerable<IExpression> rootExpressions)
         {
