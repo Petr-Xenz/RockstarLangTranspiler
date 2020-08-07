@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "RockstarLangTranspiler": {
+      "commandName": "Project",
+      "commandLineArgs": "test.rock"
+    }
+  }
+}

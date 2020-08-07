@@ -25,10 +25,10 @@ namespace RockstarLangTranspiler
             while(current < _tokens.Length)
             {
                 var (expression, position) = CreateExpressionBranch(current);
-                if (expression is null)
-                    break;
-                rootExpressions.Add(expression);
                 current = position;
+                if (expression is null)
+                    continue;
+                rootExpressions.Add(expression);
             }
 
             return new SyntaxTree(rootExpressions);
@@ -45,6 +45,7 @@ namespace RockstarLangTranspiler
                 NumberToken number => CreateConstantExpression(number, currentTokenPosition, isBackTracking),
                 AdditionToken _ => CreateAdditionExpression(currentTokenPosition),
                 OutputToken _ => CreateOutputExpression(currentTokenPosition),
+                EndOfTheLineToken _ => (null, currentTokenPosition + 1),
                 _ => throw new ArgumentException(),
             };
 
@@ -67,7 +68,8 @@ namespace RockstarLangTranspiler
 
             (IExpression, int) CreateConstantExpression(NumberToken number, int currentTokenPosition, bool isBackTracking)
             {
-                if (isBackTracking || PeekNextToken(currentTokenPosition) is EndOfFileToken)
+                var nextToken = PeekNextToken(currentTokenPosition);
+                if (isBackTracking || nextToken is EndOfFileToken || nextToken is EndOfTheLineToken)
                     return (new ConstantExpression(float.Parse(number.Value)), currentTokenPosition + 1);
                 else 
                     return CreateExpressionBranch(currentTokenPosition + 1);

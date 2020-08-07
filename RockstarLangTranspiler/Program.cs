@@ -1,7 +1,9 @@
 ﻿using RockstarLangTranspiler.Tokens.TokenFactories;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+using System.Threading;
 
 namespace RockstarLangTranspiler
 {
@@ -17,6 +19,7 @@ namespace RockstarLangTranspiler
 
         static void Main(string[] args)
         {
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             if (args.Length < 1 && !File.Exists(args[0]))
                 throw new ArgumentException("File path is expected");
 

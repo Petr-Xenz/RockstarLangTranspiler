@@ -38,6 +38,7 @@ namespace RockstarLangTranspiler
                     result.Add(factory?.CreateToken(wordWithPosition.position, wordWithPosition.word)
                         ?? new UnknownToken(wordWithPosition.position, wordWithPosition.word.Length, wordWithPosition.word));
                 }
+                result.Add(new EndOfTheLineToken(line.Length));
 
             }
             return result;
