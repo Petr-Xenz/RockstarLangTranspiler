@@ -19,6 +19,7 @@ namespace RockstarLangTranspiler
             {
                 OutputExpression output => CreateConsoleInfoExpression(output),
                 ConstantExpression constant => CreateConstantExpression(constant),
+                AdditionExpression addition => CreateAdditionExpression(addition),
                 _ => throw new NotSupportedException(expression.GetType().FullName)
             };
         }
@@ -28,5 +29,8 @@ namespace RockstarLangTranspiler
 
         private string CreateConsoleInfoExpression(OutputExpression output) 
             => $"console.info({TranspileExpression(output.ExpressionToOutput)})";
+
+        private string CreateAdditionExpression(AdditionExpression addition)
+            => $"{TranspileExpression(addition.Left)} + {TranspileExpression(addition.Right)}";
     }
 }
