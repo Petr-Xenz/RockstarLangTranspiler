@@ -12,14 +12,14 @@ namespace RockstarLangTranspiler
         private int _currentPosition;
         private readonly IReadOnlyList<TokenFactory> _tokenFactories;
 
-        public Lexer(string file, IReadOnlyList<TokenFactory> tokenFactories)
+        public Lexer(string fileContents, IReadOnlyList<TokenFactory> tokenFactories)
         {
-            if (string.IsNullOrWhiteSpace(file))
+            if (string.IsNullOrWhiteSpace(fileContents))
             {
-                throw new ArgumentException("File is empty", nameof(file));
+                throw new ArgumentException("File is empty", nameof(fileContents));
             }
 
-            _file = file;
+            _file = fileContents;
             _tokenFactories = tokenFactories ?? throw new ArgumentNullException(nameof(tokenFactories));
         }
 
