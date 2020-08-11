@@ -20,9 +20,13 @@ namespace RockstarLangTranspiler
                 OutputExpression output => CreateConsoleInfoExpression(output),
                 ConstantExpression constant => CreateConstantExpression(constant),
                 AdditionExpression addition => CreateAdditionExpression(addition),
+                VariableAssigmentExpression assigment => CreateAssigmentExpression(assigment),
                 _ => throw new NotSupportedException(expression.GetType().FullName)
             };
         }
+
+        private string CreateAssigmentExpression(VariableAssigmentExpression assigment) 
+            => $"let {assigment.VariableName} = {TranspileExpression(assigment.AssigmentExpression)}";
 
         private string CreateConstantExpression(ConstantExpression constant) 
             => constant.Value.ToString();

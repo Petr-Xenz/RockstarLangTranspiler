@@ -22,4 +22,5 @@ namespace RockstarLangTranspilerTests
             Assert.IsTrue(tokens[2] is NumberToken n2 && n2.Value == "6.7");
         }
     }
+
 }

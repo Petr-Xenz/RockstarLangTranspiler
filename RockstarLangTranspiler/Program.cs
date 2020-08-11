@@ -15,6 +15,8 @@ namespace RockstarLangTranspiler
             new NumberTokenFactory(),
             new AdditionTokenFactory(),
             new WhitespaceTokenFactory(),
+            new AssigmentTokenFactory(),
+            new WordTokenFactory(),
         };
 
         static void Main(string[] args)
@@ -23,7 +25,12 @@ namespace RockstarLangTranspiler
             if (args.Length < 1 && !File.Exists(args[0]))
                 throw new ArgumentException("File path is expected");
 
-            var lexer = new Lexer(File.ReadAllText(args[0]), _tokensFactories);
+            var file = File.ReadAllText(args[0]);
+
+            Console.WriteLine(file);
+            Console.WriteLine();
+
+            var lexer = new Lexer(file, _tokensFactories);
             var tokens = lexer.Lex();
 
             var parser = new Parser(tokens);

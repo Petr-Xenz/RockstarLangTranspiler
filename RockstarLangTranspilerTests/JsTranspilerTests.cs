@@ -43,5 +43,19 @@ namespace RockstarLangTranspilerTests
 
             Assert.AreEqual("console.info(3 + 44)", result);
         }
+
+        [TestMethod]
+        public void TranspileAssigmentExpression()
+        {
+            var tree = new SyntaxTree(new[]
+            {
+                    new VariableAssigmentExpression("x", new ConstantExpression(3))
+            });
+
+            var transpiler = new JsTranspiler();
+            var result = transpiler.Transpile(tree);
+
+            Assert.AreEqual("let x = 3", result);
+        }
     }
 }
