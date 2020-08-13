@@ -5,7 +5,7 @@ namespace RockstarLangTranspiler.Tokens.TokenFactories
 {
     public class AssigmentTokenFactory : TokenFactory
     {
-        public override IReadOnlyCollection<string> KeyWords => new []{ "let", "be", "is", "put", "into" };
+        public override IReadOnlyCollection<string> KeyWords => new []{ "let", "be", "is", "are", "was", "were", "put", "into" };
 
         public override bool CanParseFarther(string value) => false;
 
