@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace RockstarLangTranspiler
@@ -47,7 +48,7 @@ namespace RockstarLangTranspiler
                 AdditionToken _ => CreateAdditionExpression(currentTokenPosition),
                 OutputToken _ => CreateOutputExpression(currentTokenPosition),
                 AssigmentToken _ => CreateAssigmentExpression(currentTokenPosition),
-                WordToken _ => ParseWordToken(currentTokenPosition),
+                WordToken _ => ParseWordToken(currentTokenPosition, isBackTracking),
                 EndOfTheLineToken _ => (null, currentTokenPosition + 1),
                 _ => throw new ArgumentException(),
             };
@@ -125,23 +126,78 @@ namespace RockstarLangTranspiler
 
         }
 
-        private (IExpression expression, int nextTokenPosition) ParseWordToken(int currentTokenPosition)
+        private (IExpression expression, int nextTokenPosition) ParseWordToken(int currentTokenPosition, bool isBackTracking = false)
         {
             var token = _tokens[currentTokenPosition];
             var nextToken = PeekNextToken(currentTokenPosition);
-            var result = nextToken switch
+            var result = (nextToken, isBackTracking) switch
             {
-                AssigmentToken _ => CreateSimpleAssigment(),
+                (AssigmentToken _, _) => CreateSimpleAssigment(),
+                (FunctionDeclarationToken _, _) => CreateFunctionExpression(currentTokenPosition),
+                (AdditionToken _, false) => CreateExpressionBranch(currentTokenPosition + 1, true),
+                (AdditionToken _, true) => CreateSimpleVariableExpression(),
+                (EndOfTheLineToken _, _) => CreateSimpleVariableExpression(),
+                (EndOfFileToken _, _) => CreateSimpleVariableExpression(),
                 _ => throw new NotSupportedException(),
             };
 
             return result;
+
+            (IExpression, int) CreateSimpleVariableExpression()
+            {
+                return (new VariableExpression(token.Value), currentTokenPosition + 1);
+            }
 
             (IExpression, int) CreateSimpleAssigment()
             {
                 var (expression, nextTokenPosition) = CreateExpressionBranch(currentTokenPosition + 2);
                 return (new VariableAssigmentExpression(token.Value, expression), nextTokenPosition);
             }
+        }
+
+        private (IExpression, int) CreateFunctionExpression(int currentTokenPosition)
+        {
+            var functionName = _tokens[currentTokenPosition].Value;
+            var arguments = SelectArgumentsFromLine(currentTokenPosition + 2);
+            var nextLinePosition = GetNextLinePosition(currentTokenPosition);
+
+            var innerExpressions = new List<IExpression>();
+
+            if (_tokens[nextLinePosition] is FunctionReturnToken)
+            {
+                var (returnExpression, nextTokenPosition) = CreateExpressionBranch(nextLinePosition + 2);
+                innerExpressions.Add(returnExpression);
+                return (new FunctionExpression(returnExpression, arguments, functionName), nextTokenPosition);
+            }
+
+            throw new NotImplementedException();
+
+            IEnumerable<FunctionArgument> SelectArgumentsFromLine(int position)
+            {                
+                while(_tokens.Length < position || !(_tokens[position] is EndOfTheLineToken))
+                {
+                    var token = _tokens[position];
+                    position++;
+                    if (token is WordToken)
+                    {
+                        yield return new FunctionArgument(token.Value);
+                    }
+                }
+            }
+        }
+
+        private int GetNextLinePosition(int currentTokenPosition)
+        {
+            while(currentTokenPosition < _tokens.Length)
+            {
+                var token = PeekNextToken(currentTokenPosition);
+                if (token is EndOfTheLineToken)
+                    return currentTokenPosition + 2;
+                else
+                    currentTokenPosition++;
+            }
+
+            return currentTokenPosition;
         }
 
         private Token PeekNextToken(int currentTokenPosition)
