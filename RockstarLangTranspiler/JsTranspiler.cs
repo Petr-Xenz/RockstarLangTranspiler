@@ -22,12 +22,15 @@ namespace RockstarLangTranspiler
             {
                 OutputExpression output => CreateConsoleInfoExpression(output),
                 ConstantExpression constant => CreateConstantExpression(constant),
+                VariableExpression variable => CreateVariableExpression(variable),
                 AdditionExpression addition => CreateAdditionExpression(addition),
                 VariableAssigmentExpression assigment => CreateAssigmentExpression(assigment),
                 FunctionExpression function => CreateFunctionExpression(function),
                 _ => throw new NotSupportedException(expression.GetType().FullName)
             };
         }
+
+        private string CreateVariableExpression(VariableExpression variable) => variable.VariableName;
 
         private string CreateFunctionExpression(FunctionExpression function)
         {

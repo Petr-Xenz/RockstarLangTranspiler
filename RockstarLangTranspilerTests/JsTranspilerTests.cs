@@ -64,14 +64,34 @@ namespace RockstarLangTranspilerTests
         {
             var tree = new SyntaxTree(new[]
             {
-                    new FunctionExpression(new [] { new ConstantExpression(3) }, 
-                    new[] { new FunctionArgument("x"), new FunctionArgument("y") }, 
+                    new FunctionExpression(new [] { new ConstantExpression(3) },
+                    new[] { new FunctionArgument("x"), new FunctionArgument("y") },
                     "fun")
             });
 
             var result = new JsTranspiler().Transpile(tree);
 
             var function = "function fun(x, y){\n\treturn 3\n}";
+
+            Assert.AreEqual(function, result);
+        }
+
+        [TestMethod]
+        public void TranspileVariableFunctionFunctionExpression()
+        {
+            var tree = new SyntaxTree(new[]
+            {
+                    new FunctionExpression(new [] 
+                    { 
+                        new AdditionExpression(new VariableExpression("x"), new VariableExpression("y")) 
+                    },
+                    new[] { new FunctionArgument("x"), new FunctionArgument("y") },
+                    "fun")
+            });
+
+            var result = new JsTranspiler().Transpile(tree);
+
+            var function = "function fun(x, y){\n\treturn x + y\n}";
 
             Assert.AreEqual(function, result);
         }
