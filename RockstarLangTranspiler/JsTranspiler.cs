@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace RockstarLangTranspiler
 {
@@ -30,13 +31,27 @@ namespace RockstarLangTranspiler
 
         private string CreateFunctionExpression(FunctionExpression function)
         {
-            return $"function {function.Name}({TransformArguments(function.Arguments)}){{\n\t{TranspileInnerExpression(function.InnerExpression)}\n}}";
+            return $"function {function.Name}({TransformArguments(function.Arguments)}){{\n{TranspileInnerExpressions(function.InnerExpressions)}\n}}";
 
-            string TranspileInnerExpression(IExpression expression)
+            string TranspileInnerExpressions(IEnumerable<IExpression> expressions)
             {
-                return expression.IsVoidType()
-                    ? TranspileExpression(expression)
-                    : $"return {TranspileExpression(expression)}";
+                var builder = new StringBuilder();
+                var enumerated = expressions.ToArray();
+
+                for (int i = 0; i < enumerated.Length - 1; i++)
+                {
+                    var expression = enumerated[i];
+                    builder.AppendLine($"\t{TranspileExpression(expression)}");
+                }
+
+                var lastExpression = enumerated[enumerated.Length - 1];
+
+                var lastLine = lastExpression.IsVoidType()
+                    ? $"\t{TranspileExpression(lastExpression)}"
+                    : $"\treturn {TranspileExpression(lastExpression)}";
+
+                builder.Append(lastLine);
+                return builder.ToString();
             }
 
             static string TransformArguments(IEnumerable<FunctionArgument> args)

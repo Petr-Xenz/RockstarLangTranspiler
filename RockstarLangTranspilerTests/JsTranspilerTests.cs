@@ -64,7 +64,7 @@ namespace RockstarLangTranspilerTests
         {
             var tree = new SyntaxTree(new[]
             {
-                    new FunctionExpression(new ConstantExpression(3), 
+                    new FunctionExpression(new [] { new ConstantExpression(3) }, 
                     new[] { new FunctionArgument("x"), new FunctionArgument("y") }, 
                     "fun")
             });
@@ -74,6 +74,49 @@ namespace RockstarLangTranspilerTests
             var function = "function fun(x, y){\n\treturn 3\n}";
 
             Assert.AreEqual(function, result);
+        }
+
+        [TestMethod]
+        public void TranspileSingleStatementFunction()
+        {
+            var tree = new SyntaxTree(new[]
+{
+                    new FunctionExpression(new [] { new OutputExpression(new ConstantExpression(3)) },
+                    new[] { new FunctionArgument("x"), new FunctionArgument("y") },
+                    "fun")
+            });
+
+            var result = new JsTranspiler().Transpile(tree);
+            var function = "function fun(x, y){\n\tconsole.info(3)\n}";
+            Assert.AreEqual(function, result);
+        }
+
+        [TestMethod]
+        public void TranspileMultipleExpressionsFunction()
+        {
+            var tree = new SyntaxTree(new[]
+{
+                    new FunctionExpression(new IExpression[] 
+                        {
+                            new OutputExpression(new ConstantExpression(3)),
+                            new OutputExpression(new ConstantExpression(4)),
+                            new ConstantExpression(5),
+                        },
+                    new[] { new FunctionArgument("x"), new FunctionArgument("y") },
+                    "fun")
+            });
+
+            var result = new JsTranspiler().Transpile(tree);
+            var function = "function fun(x, y){ console.info(3) console.info(4) return 5}";
+            Assert.AreEqual(function.RemoveNonPrintableChras(), result.RemoveNonPrintableChras());
+        }
+    }
+
+    public static class Extensions
+    {
+        public static string RemoveNonPrintableChras(this string str)
+        {
+            return str.Replace("\t", null).Replace("\n", null).Replace("\r", null).Replace(" ", null);
         }
     }
 }

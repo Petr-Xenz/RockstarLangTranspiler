@@ -163,14 +163,23 @@ namespace RockstarLangTranspiler
 
             var innerExpressions = new List<IExpression>();
 
-            if (_tokens[nextLinePosition] is FunctionReturnToken)
+            while(!(_tokens[nextLinePosition] is EndOfFileToken))
             {
-                var (returnExpression, nextTokenPosition) = CreateExpressionBranch(nextLinePosition + 2);
-                innerExpressions.Add(returnExpression);
-                return (new FunctionExpression(returnExpression, arguments, functionName), nextTokenPosition);
+                if (_tokens[nextLinePosition] is FunctionReturnToken)
+                {
+                    var (returnExpression, nextTokenPosition) = CreateExpressionBranch(nextLinePosition + 2);
+                    innerExpressions.Add(returnExpression);
+                    return (new FunctionExpression(innerExpressions, arguments, functionName), nextTokenPosition);
+                }
+                else
+                {
+                    var (functionExpression, _) = CreateExpressionBranch(nextLinePosition);
+                    innerExpressions.Add(functionExpression);
+                    nextLinePosition = GetNextLinePosition(nextLinePosition);
+                }
             }
 
-            throw new NotImplementedException();
+            throw new InvalidOperationException("Function does not return");
 
             IEnumerable<FunctionArgument> SelectArgumentsFromLine(int position)
             {                

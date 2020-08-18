@@ -6,14 +6,14 @@ namespace RockstarLangTranspiler.Expressions
 {
     public class FunctionExpression : IExpression
     {
-        public FunctionExpression(IExpression innerExpression, IEnumerable<FunctionArgument> arguments, string name)
+        public FunctionExpression(IEnumerable<IExpression> innerExpressions, IEnumerable<FunctionArgument> arguments, string name)
         {
-            InnerExpression = innerExpression ?? throw new ArgumentNullException(nameof(innerExpression));
+            InnerExpressions = innerExpressions ?? throw new ArgumentNullException(nameof(innerExpressions));
             Arguments = arguments ?? throw new ArgumentNullException(nameof(arguments));
             Name = name ?? throw new ArgumentNullException(nameof(name));
         }
 
-        public IExpression InnerExpression { get; }
+        public IEnumerable<IExpression> InnerExpressions { get; }
         
         public IEnumerable<FunctionArgument> Arguments { get; }
 
