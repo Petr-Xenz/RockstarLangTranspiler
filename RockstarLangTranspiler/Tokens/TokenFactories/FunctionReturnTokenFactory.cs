@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace RockstarLangTranspiler.Tokens.TokenFactories
 {
-    public class FunctionReturnTokenFactory : TokenFactory
+    public class FunctionReturnTokenFactory : KeyWordBasedTokenFactory<FunctionReturnToken>
     {
 
         private static string[] _keyWords = new[] { "gives", "back" };
@@ -15,14 +15,9 @@ namespace RockstarLangTranspiler.Tokens.TokenFactories
             throw new System.NotImplementedException();
         }
 
-        public override Token CreateToken(int startLocation, string value)
+        public override FunctionReturnToken CreateToken(int startLocation, string value)
         {
             return new FunctionReturnToken(0, value.Length, value);
-        }
-
-        public override bool IsValidForToken(string value)
-        {
-            return _keyWords.Any(w => w.Equals(value, System.StringComparison.OrdinalIgnoreCase));
         }
     }
 }

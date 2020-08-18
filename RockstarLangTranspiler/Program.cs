@@ -1,4 +1,5 @@
-﻿using RockstarLangTranspiler.Tokens.TokenFactories;
+﻿using RockstarLangTranspiler.Tokens;
+using RockstarLangTranspiler.Tokens.TokenFactories;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -9,7 +10,7 @@ namespace RockstarLangTranspiler
 {
     class Program
     {
-        private static IReadOnlyList<TokenFactory> _tokensFactories = new TokenFactory[]
+        private static IReadOnlyList<ITokenFactory<Token>> _tokensFactories = new ITokenFactory<Token>[]
         {
             new OutputTokenFactory(),
             new NumberTokenFactory(),

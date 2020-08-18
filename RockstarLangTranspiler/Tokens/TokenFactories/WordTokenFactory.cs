@@ -4,21 +4,21 @@ using System.Text.RegularExpressions;
 
 namespace RockstarLangTranspiler.Tokens.TokenFactories
 {
-    public class WordTokenFactory : TokenFactory
+    public class WordTokenFactory : ITokenFactory<WordToken>
     {
-        public override IReadOnlyCollection<string> KeyWords => Array.Empty<string>();
+        public IReadOnlyCollection<string> KeyWords => Array.Empty<string>();
 
-        public override bool CanParseFarther(string value)
+        public bool CanParseFarther(string value)
         {
             return true;
         }
 
-        public override Token CreateToken(int startLocation, string value)
+        public WordToken CreateToken(int startLocation, string value)
         {
             return new WordToken(startLocation, value.Length, value);
         }
 
-        public override bool IsValidForToken(string value)
+        public bool IsValidForToken(string value)
         {
             return Regex.IsMatch(value, "(a-zA-Z)*");
         }

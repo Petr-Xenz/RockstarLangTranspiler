@@ -5,7 +5,7 @@ using System.Text;
 
 namespace RockstarLangTranspiler.Tokens.TokenFactories
 {
-    public class PronounTokenFactory : TokenFactory
+    public class PronounTokenFactory : KeyWordBasedTokenFactory<PronounToken>
     {
         private static string[] _keyWords = new string[]
         {
@@ -16,8 +16,7 @@ namespace RockstarLangTranspiler.Tokens.TokenFactories
 
         public override bool CanParseFarther(string value) => false;
 
-        public override Token CreateToken(int startLocation, string value) => new PronounToken(startLocation, value.Length, value);
+        public override PronounToken CreateToken(int startLocation, string value) => new PronounToken(startLocation, value.Length, value);
 
-        public override bool IsValidForToken(string value) => KeyWords.Any(kw => string.Compare(value, kw, true) == 0);
     }
 }

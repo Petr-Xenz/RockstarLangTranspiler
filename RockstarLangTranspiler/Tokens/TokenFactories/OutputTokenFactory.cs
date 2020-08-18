@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace RockstarLangTranspiler.Tokens.TokenFactories
 {
-    public class OutputTokenFactory : TokenFactory
+    public class OutputTokenFactory : KeyWordBasedTokenFactory<OutputToken>
     {
         private static string[] _keyWords = { "say", "whisper", "shout", "scream" };
 
@@ -11,13 +11,9 @@ namespace RockstarLangTranspiler.Tokens.TokenFactories
 
         public override bool CanParseFarther(string value) => false;
 
-        public override Token CreateToken(int startLocation, string value)
+        public override OutputToken CreateToken(int startLocation, string value)
         {
             return new OutputToken(startLocation, value.Length, value);
         }
-
-        public override bool IsValidForToken(string value)
-            => _keyWords.Any(k => string.Equals(k, value, System.StringComparison.OrdinalIgnoreCase));
-
     }
 }

@@ -13,7 +13,7 @@ namespace RockstarLangTranspilerTests
         public void SingleConstantAdditionExpression()
         {
             var file = "1 with 6.7";
-            var lexer = new Lexer(file, new TokenFactory[] { new AdditionTokenFactory(), new NumberTokenFactory(), new WhitespaceTokenFactory() });
+            var lexer = new Lexer(file, new ITokenFactory<Token>[] { new AdditionTokenFactory(), new NumberTokenFactory(), new WhitespaceTokenFactory() });
             var tokens = lexer.Lex().ToArray();
 
             Assert.AreEqual(4, tokens.Length);

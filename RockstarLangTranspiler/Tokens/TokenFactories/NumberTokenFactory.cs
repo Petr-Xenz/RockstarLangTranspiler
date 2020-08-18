@@ -4,18 +4,18 @@ using System.Globalization;
 
 namespace RockstarLangTranspiler.Tokens.TokenFactories
 {
-    public class NumberTokenFactory : TokenFactory
+    public class NumberTokenFactory : ITokenFactory<NumberToken>
     {
-        public override IReadOnlyCollection<string> KeyWords => Array.Empty<string>();
+        public IReadOnlyCollection<string> KeyWords => Array.Empty<string>();
 
-        public override bool CanParseFarther(string value) 
+        public bool CanParseFarther(string value) 
             => value.EndsWith('.') || IsValidForToken(value);
 
-        public override Token CreateToken(int startLocation, string value)
+        public NumberToken CreateToken(int startLocation, string value)
         {
             return new NumberToken(startLocation, value.Length, value);
         }
 
-        public override bool IsValidForToken(string value) => float.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out _);
+        public bool IsValidForToken(string value) => float.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out _);
     }
 }

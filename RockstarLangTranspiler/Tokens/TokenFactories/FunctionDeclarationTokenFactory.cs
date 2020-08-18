@@ -2,7 +2,7 @@
 
 namespace RockstarLangTranspiler.Tokens.TokenFactories
 {
-    public class FunctionDeclarationTokenFactory : TokenFactory
+    public class FunctionDeclarationTokenFactory : KeyWordBasedTokenFactory<FunctionDeclarationToken>
     {
 
         private static readonly string[] _keyWords = new[] { "takes" };
@@ -14,14 +14,9 @@ namespace RockstarLangTranspiler.Tokens.TokenFactories
             throw new System.NotImplementedException();
         }
 
-        public override Token CreateToken(int startLocation, string value)
+        public override FunctionDeclarationToken CreateToken(int startLocation, string value)
         {
             return new FunctionDeclarationToken(startLocation, value.Length, value);
-        }
-
-        public override bool IsValidForToken(string value)
-        {
-            return value.Equals(_keyWords[0], System.StringComparison.OrdinalIgnoreCase);
         }
     }
 }

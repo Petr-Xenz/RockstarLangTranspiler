@@ -13,7 +13,7 @@ namespace RockstarLangTranspilerTests
         public void SimpleAssigmentTest()
         {
             var file = "Foo is 5";
-            var lexer = new Lexer(file, new TokenFactory[] { new AssigmentTokenFactory(), new NumberTokenFactory(), new WordTokenFactory() });
+            var lexer = new Lexer(file, new ITokenFactory<Token>[] { new AssigmentTokenFactory(), new NumberTokenFactory(), new WordTokenFactory() });
             var tokens = lexer.Lex().ToArray();
 
             Assert.AreEqual(4, tokens.Length);
@@ -26,7 +26,7 @@ namespace RockstarLangTranspilerTests
         public void MultiWordAssigmentTest()
         {
             var file = "Let foo is bar";
-            var lexer = new Lexer(file, new TokenFactory[] { new AssigmentTokenFactory(), new NumberTokenFactory(), new WordTokenFactory() });
+            var lexer = new Lexer(file, new ITokenFactory<Token>[] { new AssigmentTokenFactory(), new NumberTokenFactory(), new WordTokenFactory() });
             var tokens = lexer.Lex().ToArray();
 
             Assert.AreEqual(5, tokens.Length);

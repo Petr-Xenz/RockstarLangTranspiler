@@ -10,9 +10,9 @@ namespace RockstarLangTranspiler
     {
         private readonly string _file;
         private int _currentPosition;
-        private readonly IReadOnlyList<TokenFactory> _tokenFactories;
+        private readonly IReadOnlyList<ITokenFactory<Token>> _tokenFactories;
 
-        public Lexer(string fileContents, IReadOnlyList<TokenFactory> tokenFactories)
+        public Lexer(string fileContents, IReadOnlyList<ITokenFactory<Token>> tokenFactories)
         {
             if (string.IsNullOrWhiteSpace(fileContents))
             {
