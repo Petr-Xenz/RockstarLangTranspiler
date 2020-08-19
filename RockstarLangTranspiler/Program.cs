@@ -19,6 +19,7 @@ namespace RockstarLangTranspiler
             new AssigmentTokenFactory(),
             new FunctionDeclarationTokenFactory(),
             new FunctionReturnTokenFactory(),
+            new FunctionInvokationTokenFactory(),
             new WordTokenFactory(),
         };
 
