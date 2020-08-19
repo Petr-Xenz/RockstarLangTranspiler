@@ -134,6 +134,7 @@ namespace RockstarLangTranspiler
             {
                 (AssigmentToken _, _) => CreateSimpleAssigment(),
                 (FunctionDeclarationToken _, _) => CreateFunctionExpression(currentTokenPosition),
+                (FunctionInvokationToken _, _) => CreateFunctionInvokationExpression(currentTokenPosition),
                 (AdditionToken _, false) => CreateExpressionBranch(currentTokenPosition + 1, true),
                 (AdditionToken _, true) => CreateSimpleVariableExpression(),
                 (EndOfTheLineToken _, _) => CreateSimpleVariableExpression(),
@@ -152,6 +153,28 @@ namespace RockstarLangTranspiler
             {
                 var (expression, nextTokenPosition) = CreateExpressionBranch(currentTokenPosition + 2);
                 return (new VariableAssigmentExpression(token.Value, expression), nextTokenPosition);
+            }
+        }
+
+        private (IExpression, int) CreateFunctionInvokationExpression(int currentTokenPosition)
+        {
+            var functionName = _tokens[currentTokenPosition].Value;
+            var nextLinePosition = GetNextLinePosition(currentTokenPosition);
+            var arguments = SelectArgumentExpressionsFromLine(currentTokenPosition + 2);
+
+            return (new FunctionInvokationExpression(arguments, functionName), nextLinePosition);
+
+            IEnumerable<IExpression> SelectArgumentExpressionsFromLine(int tokenPosition)
+            {
+                do
+                {
+                    var (argumentExpression, nextToken) = CreateExpressionBranch(tokenPosition);
+                    tokenPosition = nextToken;
+                    if (argumentExpression is null)
+                        break;
+                    yield return argumentExpression;
+                }
+                while (tokenPosition < nextLinePosition);
             }
         }
 
@@ -182,8 +205,8 @@ namespace RockstarLangTranspiler
             throw new InvalidOperationException("Function does not return");
 
             IEnumerable<FunctionArgument> SelectArgumentsFromLine(int position)
-            {                
-                while(_tokens.Length < position || !(_tokens[position] is EndOfTheLineToken))
+            {
+                while (_tokens.Length < position || !(_tokens[position] is EndOfTheLineToken))
                 {
                     var token = _tokens[position];
                     position++;
@@ -193,7 +216,7 @@ namespace RockstarLangTranspiler
                     }
                 }
             }
-        }
+        }        
 
         private int GetNextLinePosition(int currentTokenPosition)
         {
