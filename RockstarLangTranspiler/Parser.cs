@@ -73,10 +73,10 @@ namespace RockstarLangTranspiler
             (IExpression, int) CreateConstantExpression(NumberToken number, int currentTokenPosition, bool isBackTracking)
             {
                 var nextToken = PeekNextToken(currentTokenPosition);
-                if (isBackTracking || nextToken is EndOfFileToken || nextToken is EndOfTheLineToken)
+                if (isBackTracking || !nextToken.IsCombiningToken())
                     return (new ConstantExpression(float.Parse(number.Value)), currentTokenPosition + 1);
                 else 
-                    return CreateExpressionBranch(currentTokenPosition + 1);
+                      return CreateExpressionBranch(currentTokenPosition + 1);
             }
         }
 
@@ -159,22 +159,36 @@ namespace RockstarLangTranspiler
         private (IExpression, int) CreateFunctionInvokationExpression(int currentTokenPosition)
         {
             var functionName = _tokens[currentTokenPosition].Value;
-            var nextLinePosition = GetNextLinePosition(currentTokenPosition);
-            var arguments = SelectArgumentExpressionsFromLine(currentTokenPosition + 2);
+            var (arguments, nextTokenPosition) = SelectArgumentExpressionsFromLine(currentTokenPosition + 2);
 
-            return (new FunctionInvokationExpression(arguments, functionName), nextLinePosition);
+            return (new FunctionInvokationExpression(arguments, functionName), nextTokenPosition);
 
-            IEnumerable<IExpression> SelectArgumentExpressionsFromLine(int tokenPosition)
+            (IEnumerable<IExpression> expression, int nextTokenPosition) SelectArgumentExpressionsFromLine(int tokenPosition)
             {
-                do
+                var result = new List<IExpression>();
+                var nextToken = _tokens[tokenPosition];
+                while(CanParseArgumentsFarther(nextToken))
                 {
-                    var (argumentExpression, nextToken) = CreateExpressionBranch(tokenPosition);
-                    tokenPosition = nextToken;
+                    var (argumentExpression, nextTokenPosition) = CreateExpressionBranch(tokenPosition);
+                    tokenPosition = nextTokenPosition;
+                    nextToken = _tokens[tokenPosition];
                     if (argumentExpression is null)
                         break;
-                    yield return argumentExpression;
+                    result.Add(argumentExpression);
                 }
-                while (tokenPosition < nextLinePosition);
+
+                return (result, tokenPosition);
+
+                static bool CanParseArgumentsFarther(Token token)
+                {
+                    return token switch
+                    {
+                        AssigmentToken _ => false,
+                        EndOfTheLineToken _ => false,
+                        EndOfFileToken _ => false,
+                        _ => true,
+                    };
+                }
             }
         }
 
