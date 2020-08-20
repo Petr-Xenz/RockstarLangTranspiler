@@ -4,9 +4,9 @@ using System.Diagnostics.Contracts;
 
 namespace RockstarLangTranspiler.Expressions
 {
-    public class FunctionInvokationExpression : IExpression
+    public class FunctionInvocationExpression : IExpression
     {
-        public FunctionInvokationExpression(IEnumerable<IExpression> argumentExpressions, string name)
+        public FunctionInvocationExpression(IEnumerable<IExpression> argumentExpressions, string name)
         {
             if (string.IsNullOrWhiteSpace(name))
             {

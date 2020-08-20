@@ -26,8 +26,14 @@ namespace RockstarLangTranspiler
                 AdditionExpression addition => CreateAdditionExpression(addition),
                 VariableAssigmentExpression assigment => CreateAssigmentExpression(assigment),
                 FunctionExpression function => CreateFunctionExpression(function),
+                FunctionInvocationExpression invokation => CreateFunctionInvokationExpression(invokation),
                 _ => throw new NotSupportedException(expression.GetType().FullName)
             };
+        }
+
+        private string CreateFunctionInvokationExpression(FunctionInvocationExpression invocation)
+        {
+            return $"{invocation.Name}({invocation.ArgumentExpressions.Select(TranspileExpression).Aggregate((p, c) => $"{p}, {c}")})";
         }
 
         private string CreateVariableExpression(VariableExpression variable) => variable.VariableName;

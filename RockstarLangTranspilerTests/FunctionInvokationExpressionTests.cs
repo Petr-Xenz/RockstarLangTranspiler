@@ -15,7 +15,7 @@ namespace RockstarLangTranspilerTests
             var tokens = new Token[]
             {
                 new WordToken(0, 0, "func"),
-                new FunctionInvokationToken(0, 0, "taking"),
+                new FunctionInvocationToken(0, 0, "taking"),
                 new NumberToken(0, 0, "3"),
                 new EndOfTheLineToken(0),
             };
@@ -24,7 +24,7 @@ namespace RockstarLangTranspilerTests
             var result = parser.Parse().RootExpressions.ToArray();
 
             Assert.AreEqual(1, result.Length);
-            var invokeExp = result[0] as FunctionInvokationExpression;
+            var invokeExp = result[0] as FunctionInvocationExpression;
 
             Assert.IsNotNull(invokeExp);
             Assert.AreEqual("func", invokeExp.Name);
@@ -40,7 +40,7 @@ namespace RockstarLangTranspilerTests
                 new WordToken(0, 0, "var"),
                 new AssigmentToken(0, 0, "is"),
                 new WordToken(0, 0, "func"),
-                new FunctionInvokationToken(0, 0, "taking"),
+                new FunctionInvocationToken(0, 0, "taking"),
                 new NumberToken(0, 0, "3"),
                 new EndOfTheLineToken(0),
             };
@@ -53,8 +53,8 @@ namespace RockstarLangTranspilerTests
             var varExp = result[0] as VariableAssigmentExpression;
 
             Assert.AreEqual(varExp.VariableName, "var");
-            Assert.IsTrue(varExp.AssigmentExpression is FunctionInvokationExpression);
-            var invokeExp = varExp.AssigmentExpression as FunctionInvokationExpression;
+            Assert.IsTrue(varExp.AssigmentExpression is FunctionInvocationExpression);
+            var invokeExp = varExp.AssigmentExpression as FunctionInvocationExpression;
 
             Assert.IsNotNull(invokeExp);
             Assert.AreEqual("func", invokeExp.Name);
@@ -69,7 +69,7 @@ namespace RockstarLangTranspilerTests
             {
                 new AssigmentToken(0, 0, "put"),
                 new WordToken(0, 0, "func"),
-                new FunctionInvokationToken(0, 0, "taking"),
+                new FunctionInvocationToken(0, 0, "taking"),
                 new NumberToken(0, 0, "3"),
                 new AssigmentToken(0, 0, "into"),
                 new WordToken(0, 0, "var"),
@@ -84,8 +84,8 @@ namespace RockstarLangTranspilerTests
             var varExp = result[0] as VariableAssigmentExpression;
 
             Assert.AreEqual(varExp.VariableName, "var");
-            Assert.IsTrue(varExp.AssigmentExpression is FunctionInvokationExpression);
-            var invokeExp = varExp.AssigmentExpression as FunctionInvokationExpression;
+            Assert.IsTrue(varExp.AssigmentExpression is FunctionInvocationExpression);
+            var invokeExp = varExp.AssigmentExpression as FunctionInvocationExpression;
 
             Assert.IsNotNull(invokeExp);
             Assert.AreEqual("func", invokeExp.Name);
