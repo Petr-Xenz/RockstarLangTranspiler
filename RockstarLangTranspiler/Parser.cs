@@ -59,9 +59,9 @@ namespace RockstarLangTranspiler
 
             (AdditionExpression, int) CreateAdditionExpression(int currentTokenPosition)
             {
-                return (new AdditionExpression(CreateExpressionBranch(currentTokenPosition - 1, true).expression, 
-                    CreateExpressionBranch(currentTokenPosition + 1).expression),
-                    currentTokenPosition + 2);
+                var (left, _) = CreateExpressionBranch(currentTokenPosition - 1, true);
+                var (right, next) = CreateExpressionBranch(currentTokenPosition + 1);
+                return (new AdditionExpression(left, right), next);
             }
 
             (OutputExpression, int) CreateOutputExpression(int currentTokenPosition)
