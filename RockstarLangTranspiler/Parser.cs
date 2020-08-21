@@ -3,9 +3,6 @@ using RockstarLangTranspiler.Tokens;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Metadata.Ecma335;
-using System.Runtime.InteropServices;
-using System.Text;
 
 namespace RockstarLangTranspiler
 {
@@ -93,13 +90,11 @@ namespace RockstarLangTranspiler
 
             (VariableAssigmentExpression, int) LetAssigmentBranch()
             {
-                var expectedVariableToken = PeekNextToken(currentTokenPosition) as WordToken;
-                if (expectedVariableToken is null)
-                    throw new UnexpectedTokenException();
+                var expectedVariableToken = PeekNextToken(currentTokenPosition) as WordToken 
+                    ?? throw new UnexpectedTokenException();
                 var variable = expectedVariableToken.Value;
-                var expectedAuxiliaryToken = PeekNextToken(currentTokenPosition + 1) as AssigmentToken;
-                if (expectedAuxiliaryToken is null)
-                    throw new UnexpectedTokenException();
+                var expectedAuxiliaryToken = PeekNextToken(currentTokenPosition + 1) as AssigmentToken 
+                    ?? throw new UnexpectedTokenException();
 
                 var (expression, nextTokenPosition) = CreateExpressionBranch(currentTokenPosition + 3);
 
@@ -114,16 +109,14 @@ namespace RockstarLangTranspiler
                 if (expectedAuxiliaryToken is null || !expectedAuxiliaryToken.Value.Equals("into", StringComparison.OrdinalIgnoreCase))
                     throw new UnexpectedTokenException();
 
-                var expectedVariableToken = PeekNextToken(nextTokenPosition) as WordToken;
-                if (expectedVariableToken is null)
-                    throw new UnexpectedTokenException(PeekNextToken(nextTokenPosition).ToString());
+                var expectedVariableToken = PeekNextToken(nextTokenPosition) as WordToken
+                    ?? throw new UnexpectedTokenException(PeekNextToken(nextTokenPosition).ToString());
 
                 var variable = expectedVariableToken.Value;
 
                 return (new VariableAssigmentExpression(variable, expression),
                     nextTokenPosition + 2);
             }
-
         }
 
         private (IExpression expression, int nextTokenPosition) ParseWordToken(int currentTokenPosition, bool isBackTracking = false)
