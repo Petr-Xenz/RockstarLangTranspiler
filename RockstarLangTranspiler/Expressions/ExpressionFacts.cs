@@ -1,6 +1,4 @@
-﻿using RockstarLangTranspiler.Tokens;
-
-namespace RockstarLangTranspiler.Expressions
+﻿namespace RockstarLangTranspiler.Expressions
 {
     public static class ExpressionFacts
     {
@@ -14,18 +12,6 @@ namespace RockstarLangTranspiler.Expressions
 
                 default: return false;
             }
-        }
-    }
-
-    public static class TokenFacts
-    {
-        public static bool IsCombiningToken(this Token token)
-        {
-            return token switch
-            {
-                AdditionToken _ => true,
-                _ => false,
-            };
         }
     }
 
