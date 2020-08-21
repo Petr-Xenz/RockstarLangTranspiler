@@ -7,7 +7,7 @@ using System.Linq;
 namespace RockstarLangTranspilerTests
 {
     [TestClass]
-    public class LexPronounceTokensTests
+    public class PronounceTokensLexingTests
     {
         [TestMethod]
         public void LexFindsSingleToken()

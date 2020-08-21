@@ -7,7 +7,7 @@ using System.Linq;
 namespace RockstarLangTranspilerTests
 {
     [TestClass]
-    public class AdditionTokensTests
+    public class AdditionTokensLexingTests
     {
         [TestMethod]
         public void SingleConstantAdditionExpression()
