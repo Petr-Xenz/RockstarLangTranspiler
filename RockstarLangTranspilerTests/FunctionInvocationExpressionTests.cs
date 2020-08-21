@@ -7,10 +7,10 @@ using System.Linq;
 namespace RockstarLangTranspilerTests
 {
     [TestClass]
-    public class FunctionInvokationExpressionTests
+    public class FunctionInvocationExpressionTests
     {
         [TestMethod]
-        public void SingleArgumentFunctionInvokation()
+        public void SingleArgumentFunctionInvoсation()
         {
             var tokens = new Token[]
             {

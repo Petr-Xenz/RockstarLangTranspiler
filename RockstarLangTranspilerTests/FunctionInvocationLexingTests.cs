@@ -7,10 +7,10 @@ using System.Linq;
 namespace RockstarLangTranspilerTests
 {
     [TestClass]
-    public class FunctionInvokationLexingTests
+    public class FunctionInvocationLexingTests
     {
         [TestMethod]
-        public void SingleArgumentFunctionInvokation()
+        public void SingleArgumentFunctionInvoсation()
         {
             var input = "func taking 3";
             var lexer = new Lexer(input, new ITokenFactory<Token>[] { new FunctionInvocationTokenFactory(), new NumberTokenFactory(), new WordTokenFactory() });
