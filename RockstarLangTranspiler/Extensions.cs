@@ -17,12 +17,17 @@ namespace RockstarLangTranspiler
                 {
                     position++;
                     wordStart = position;
-                    continue;
+                }
+                else if (IsComma(position))
+                {
+                    result.Add((",", position));
+                    position++;
+                    wordStart = position;
                 }
                 else
                 {
                     position++;
-                    if (position < line.Length && IsSpace(position) || position == line.Length)
+                    if (position < line.Length && (IsSpace(position) || IsComma(position)) || position == line.Length)
                     {
                         result.Add((line.Substring(wordStart, position - wordStart), wordStart));
                     }
@@ -32,6 +37,8 @@ namespace RockstarLangTranspiler
             return result.ToArray();
 
             bool IsSpace(int current) => line[current] == ' ' || line[current] == '\t';
+
+            bool IsComma(int current) => line[current] == ',';
         }
     }
 }

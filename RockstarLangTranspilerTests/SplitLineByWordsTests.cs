@@ -37,5 +37,38 @@ namespace RockstarLangTranspilerTests
             Assert.AreEqual(("bar", 7), splitted[1]);
             Assert.AreEqual(("baz", 11), splitted[2]);
         }
+
+        [TestMethod]
+        public void SplitsCommaAsSeparateWord()
+        {
+            var input = "foo, bar";
+            var splitted = input.SplitLineByWords();
+            Assert.AreEqual(3, splitted.Length);
+            Assert.AreEqual("foo", splitted[0].word);
+            Assert.AreEqual(",", splitted[1].word);
+            Assert.AreEqual("bar", splitted[2].word);
+        }
+
+        [TestMethod]
+        public void SplitsCommaAsSeparateWordWithoutWhitespace()
+        {
+            var input = "foo,bar";
+            var splitted = input.SplitLineByWords();
+            Assert.AreEqual(3, splitted.Length);
+            Assert.AreEqual("foo", splitted[0].word);
+            Assert.AreEqual(",", splitted[1].word);
+            Assert.AreEqual("bar", splitted[2].word);
+        }
+
+        [TestMethod]
+        public void SplitMultipleCommasInTheRaw()
+        {
+            var input = ",,,";
+            var splitted = input.SplitLineByWords();
+            Assert.AreEqual(3, splitted.Length);
+            Assert.AreEqual(",", splitted[0].word);
+            Assert.AreEqual(",", splitted[1].word);
+            Assert.AreEqual(",", splitted[2].word);
+        }
     }
 }
