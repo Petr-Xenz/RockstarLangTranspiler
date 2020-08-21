@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using RockstarLangTranspiler;
 using RockstarLangTranspiler.Expressions;
+using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 
 namespace RockstarLangTranspilerTests
@@ -130,6 +131,25 @@ namespace RockstarLangTranspilerTests
             var function = "function fun(x, y){ console.info(3) console.info(4) return 5}";
             Assert.AreEqual(function.RemoveNonPrintableChras(), result.RemoveNonPrintableChras());
         }
+
+        [TestMethod]
+        public void TranspileFunctionInvocation()
+        {
+            var tree = new SyntaxTree(new[]
+            {
+                new FunctionInvocationExpression(new IExpression[]
+                {
+                    new ConstantExpression(1),
+                    new AdditionExpression(new ConstantExpression(2), new ConstantExpression(3)),
+                    new FunctionInvocationExpression(Enumerable.Empty<IExpression>(), "argFunc")
+                }, "func")
+            });
+
+            var result = new JsTranspiler().Transpile(tree);
+            var expected = "func(1, 2 + 3, argFunc())";
+            Assert.AreEqual(expected.RemoveNonPrintableChras(), result.RemoveNonPrintableChras());
+        }
+
     }
 
     public static class Extensions
