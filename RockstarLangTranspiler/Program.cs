@@ -4,25 +4,13 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Threading;
 
 namespace RockstarLangTranspiler
 {
     class Program
     {
-        private static IReadOnlyList<ITokenFactory<Token>> _tokensFactories = new ITokenFactory<Token>[]
-        {
-            new OutputTokenFactory(),
-            new NumberTokenFactory(),
-            new AdditionTokenFactory(),
-            new WhitespaceTokenFactory(),
-            new AssigmentTokenFactory(),
-            new FunctionDeclarationTokenFactory(),
-            new FunctionReturnTokenFactory(),
-            new FunctionInvocationTokenFactory(),
-            new WordTokenFactory(),
-        };
-
         static void Main(string[] args)
         {
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
@@ -34,7 +22,15 @@ namespace RockstarLangTranspiler
             Console.WriteLine(file);
             Console.WriteLine();
 
-            var lexer = new Lexer(file, _tokensFactories);
+            var factories = typeof(Program).Assembly
+                .GetTypes()
+                .Where(t => t.Name.EndsWith("TokenFactory"))
+                .Where(t => !t.IsAbstract)
+                .Select(t => Activator.CreateInstance(t))
+                .OfType<ITokenFactory<Token>>()
+                .ToList();
+
+            var lexer = new Lexer(file, factories);
             var tokens = lexer.Lex();
 
             var parser = new Parser(tokens);
