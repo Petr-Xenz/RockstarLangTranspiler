@@ -127,7 +127,7 @@ namespace RockstarLangTranspiler
             {
                 (AssigmentToken _, _) => CreateSimpleAssigment(),
                 (FunctionDeclarationToken _, _) => CreateFunctionExpression(currentTokenPosition),
-                (FunctionInvocationToken _, _) => CreateFunctionInvokationExpression(currentTokenPosition),
+                (FunctionInvocationToken _, _) => CreateFunctionInvocationExpression(currentTokenPosition),
                 (AdditionToken _, false) => CreateExpressionBranch(currentTokenPosition + 1, true),
                 (AdditionToken _, true) => CreateSimpleVariableExpression(),
                 (EndOfTheLineToken _, _) => CreateSimpleVariableExpression(),
@@ -149,7 +149,7 @@ namespace RockstarLangTranspiler
             }
         }
 
-        private (IExpression, int) CreateFunctionInvokationExpression(int currentTokenPosition)
+        private (IExpression, int) CreateFunctionInvocationExpression(int currentTokenPosition)
         {
             var functionName = _tokens[currentTokenPosition].Value;
             var (arguments, nextTokenPosition) = SelectArgumentExpressionsFromLine(currentTokenPosition + 2);
