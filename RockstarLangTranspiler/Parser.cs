@@ -2,6 +2,7 @@
 using RockstarLangTranspiler.Tokens;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace RockstarLangTranspiler
@@ -45,6 +46,9 @@ namespace RockstarLangTranspiler
                 AdditionToken _ => CreateAdditionExpression(currentTokenPosition),
                 OutputToken _ => CreateOutputExpression(currentTokenPosition),
                 AssigmentToken _ => CreateAssigmentExpression(currentTokenPosition),
+                AndToken _ => CreateExpressionBranch(currentTokenPosition + 1),
+                CommaToken _ => CreateExpressionBranch(currentTokenPosition + 1),
+                FunctionArgumentSeparatorToken _ => CreateExpressionBranch(currentTokenPosition + 1),
                 WordToken _ => ParseWordToken(currentTokenPosition, isBackTracking),
                 EndOfTheLineToken _ => (null, currentTokenPosition + 1),
                 _ => throw new ArgumentException(),
@@ -71,7 +75,7 @@ namespace RockstarLangTranspiler
             {
                 var nextToken = PeekNextToken(currentTokenPosition);
                 if (isBackTracking || !nextToken.IsCombiningToken())
-                    return (new ConstantExpression(float.Parse(number.Value)), currentTokenPosition + 1);
+                    return (new ConstantExpression(float.Parse(number.Value, CultureInfo.InvariantCulture)), currentTokenPosition + 1);
                 else 
                       return CreateExpressionBranch(currentTokenPosition + 1);
             }
@@ -129,9 +133,13 @@ namespace RockstarLangTranspiler
                 (FunctionDeclarationToken _, _) => CreateFunctionExpression(currentTokenPosition),
                 (FunctionInvocationToken _, _) => CreateFunctionInvocationExpression(currentTokenPosition),
                 (AdditionToken _, false) => CreateExpressionBranch(currentTokenPosition + 1, true),
+
                 (AdditionToken _, true) => CreateSimpleVariableExpression(),
                 (EndOfTheLineToken _, _) => CreateSimpleVariableExpression(),
                 (EndOfFileToken _, _) => CreateSimpleVariableExpression(),
+                (AndToken _, _) => CreateSimpleVariableExpression(),
+                (CommaToken _, _) => CreateSimpleVariableExpression(),
+                (FunctionArgumentSeparatorToken _, _) => CreateSimpleVariableExpression(),
                 _ => throw new NotSupportedException(),
             };
 
