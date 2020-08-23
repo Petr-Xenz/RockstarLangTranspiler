@@ -41,6 +41,7 @@ namespace RockstarLangTranspiler
                 result.Add(new EndOfTheLineToken(line.Length));
 
             }
+            result.Add(new EndOfTheLineToken(0));
             return result;
         }
     }

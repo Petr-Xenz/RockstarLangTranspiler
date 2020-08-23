@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Xml.Schema;
 
 namespace RockstarLangTranspiler
 {
@@ -22,7 +23,7 @@ namespace RockstarLangTranspiler
             var rootExpressions = new List<IExpression>();
             _tokenPositionToExpression.Clear();
             int current = 0;
-            while(current < _tokens.Length)
+            while(current < _tokens.Length && current >= 0)
             {
                 var (expression, position) = CreateExpressionBranch(current);
                 current = position;
@@ -36,7 +37,7 @@ namespace RockstarLangTranspiler
 
         private (IExpression expression, int nextTokenPosition) CreateExpressionBranch(int currentTokenPosition, bool isBackTracking = false)
         {
-            if (currentTokenPosition < 0 || currentTokenPosition > _tokens.Length)
+            if (currentTokenPosition < 0 || currentTokenPosition > _tokens.Length || _tokens[currentTokenPosition] is EndOfFileToken)
                 return (null, -1);
             var token = _tokens[currentTokenPosition];
 
@@ -46,6 +47,7 @@ namespace RockstarLangTranspiler
                 AdditionToken _ => CreateAdditionExpression(currentTokenPosition),
                 OutputToken _ => CreateOutputExpression(currentTokenPosition),
                 AssigmentToken _ => CreateAssigmentExpression(currentTokenPosition),
+                IfToken _ => CreateConditionExpression(currentTokenPosition),
                 AndToken _ => CreateExpressionBranch(currentTokenPosition + 1),
                 CommaToken _ => CreateExpressionBranch(currentTokenPosition + 1),
                 FunctionArgumentSeparatorToken _ => CreateExpressionBranch(currentTokenPosition + 1),
@@ -79,6 +81,27 @@ namespace RockstarLangTranspiler
                 else 
                       return CreateExpressionBranch(currentTokenPosition + 1);
             }
+        }
+
+        private (IfExpression, int) CreateConditionExpression(int currentTokenPosition)
+        {
+            var (conditionExpression, nextTokenPosition) = CreateExpressionBranch(currentTokenPosition + 1);
+            if (conditionExpression.IsVoidType())
+                throw new InvalidOperationException("Condition expression must have return value");
+
+            nextTokenPosition = GetNextLinePosition(nextTokenPosition);
+            var nextToken = _tokens[nextTokenPosition];
+
+            var inners = new List<IExpression>();
+            while(!(nextToken is EndOfFileToken || nextToken is ElseToken || _tokens[nextTokenPosition + 1] is EndOfTheLineToken))
+            {
+                var (inner, nextInner) = CreateExpressionBranch(nextTokenPosition);
+                inners.Add(inner);
+                nextToken = _tokens[nextInner];
+                nextTokenPosition = nextInner;
+            }
+
+            return (new IfExpression(conditionExpression, inners), nextTokenPosition);
         }
 
         private (VariableAssigmentExpression, int) CreateAssigmentExpression(int currentTokenPosition)
@@ -237,8 +260,9 @@ namespace RockstarLangTranspiler
         {
             while(currentTokenPosition < _tokens.Length)
             {
-                var token = PeekNextToken(currentTokenPosition);
-                if (token is EndOfTheLineToken)
+                if (_tokens[currentTokenPosition] is EndOfTheLineToken)
+                    return currentTokenPosition + 1;
+                else if (PeekNextToken(currentTokenPosition) is EndOfTheLineToken)
                     return currentTokenPosition + 2;
                 else
                     currentTokenPosition++;

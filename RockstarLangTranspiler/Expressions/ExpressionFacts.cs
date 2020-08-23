@@ -7,7 +7,9 @@
             switch (expression)
             {
                 case VariableAssigmentExpression _:
-                case OutputExpression _: 
+                case OutputExpression _:
+                case IfExpression _:
+                case ElseExpression _:
                     return true;
 
                 default: return false;
