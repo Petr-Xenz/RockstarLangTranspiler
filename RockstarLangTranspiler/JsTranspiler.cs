@@ -27,8 +27,15 @@ namespace RockstarLangTranspiler
                 VariableAssigmentExpression assigment => CreateAssigmentExpression(assigment),
                 FunctionExpression function => CreateFunctionExpression(function),
                 FunctionInvocationExpression invokation => CreateFunctionInvocationExpression(invokation),
+                IfExpression ifExpression => CreateIfExpression(ifExpression),
                 _ => throw new NotSupportedException(expression.GetType().FullName)
             };
+        }
+
+        private string CreateIfExpression(IfExpression ifExpression)
+        {
+            var inner = TranspileInnerExpressions(ifExpression.InnerExpressions);
+            return $"if ({TranspileExpression(ifExpression.ConditionExpression)}) {{\n {inner} \n}}";
         }
 
         private string CreateFunctionInvocationExpression(FunctionInvocationExpression invocation)
@@ -47,27 +54,6 @@ namespace RockstarLangTranspiler
         {
             return $"function {function.Name}({TransformArguments(function.Arguments)}){{\n{TranspileInnerExpressions(function.InnerExpressions)}\n}}";
 
-            string TranspileInnerExpressions(IEnumerable<IExpression> expressions)
-            {
-                var builder = new StringBuilder();
-                var enumerated = expressions.ToArray();
-
-                for (int i = 0; i < enumerated.Length - 1; i++)
-                {
-                    var expression = enumerated[i];
-                    builder.AppendLine($"\t{TranspileExpression(expression)}");
-                }
-
-                var lastExpression = enumerated[enumerated.Length - 1];
-
-                var lastLine = lastExpression.IsVoidType()
-                    ? $"\t{TranspileExpression(lastExpression)}"
-                    : $"\treturn {TranspileExpression(lastExpression)}";
-
-                builder.Append(lastLine);
-                return builder.ToString();
-            }
-
             static string TransformArguments(IEnumerable<FunctionArgument> args)
             {
                 if (!args.Any())
@@ -78,6 +64,27 @@ namespace RockstarLangTranspiler
                     .Aggregate((p, c) => $"{p}, {c}")
                     .Trim(',');                    
             }
+        }
+
+        private string TranspileInnerExpressions(IEnumerable<IExpression> expressions)
+        {
+            var builder = new StringBuilder();
+            var enumerated = expressions.ToArray();
+
+            for (int i = 0; i < enumerated.Length - 1; i++)
+            {
+                var expression = enumerated[i];
+                builder.AppendLine($"\t{TranspileExpression(expression)}");
+            }
+
+            var lastExpression = enumerated[enumerated.Length - 1];
+
+            var lastLine = lastExpression.IsVoidType()
+                ? $"\t{TranspileExpression(lastExpression)}"
+                : $"\treturn {TranspileExpression(lastExpression)}";
+
+            builder.Append(lastLine);
+            return builder.ToString();
         }
 
         private string CreateAssigmentExpression(VariableAssigmentExpression assigment) 
