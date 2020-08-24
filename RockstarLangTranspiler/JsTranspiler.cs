@@ -35,7 +35,11 @@ namespace RockstarLangTranspiler
         private string CreateIfExpression(IfExpression ifExpression)
         {
             var inner = TranspileInnerExpressions(ifExpression.InnerExpressions);
-            return $"if ({TranspileExpression(ifExpression.ConditionExpression)}) {{\n {inner} \n}}";
+            var elseExpressions = ifExpression.ElseExpressions.Any()
+                ? $"\n else {{ \n{TranspileInnerExpressions(ifExpression.ElseExpressions)}\n}}"
+                : string.Empty;
+
+            return $"if ({TranspileExpression(ifExpression.ConditionExpression)}) {{\n {inner} \n}}{elseExpressions}";
         }
 
         private string CreateFunctionInvocationExpression(FunctionInvocationExpression invocation)

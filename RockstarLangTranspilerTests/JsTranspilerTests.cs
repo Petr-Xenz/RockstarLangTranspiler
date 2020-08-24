@@ -150,7 +150,7 @@ namespace RockstarLangTranspilerTests
         }
 
         [TestMethod]
-        public void TranspileSIngleIfExpression()
+        public void TranspileSingleIfExpression()
         {
             var tree = new SyntaxTree(new[]
             {
@@ -162,6 +162,26 @@ namespace RockstarLangTranspilerTests
 
             var result = new JsTranspiler().Transpile(tree);
             var expected = "if (1) { console.info(1) }";
+
+            Assert.AreEqual(expected.RemoveNonPrintableChras(), result.RemoveNonPrintableChras());
+        }
+
+        [TestMethod]
+        public void TranspileIfElseExpression()
+        {
+            var tree = new SyntaxTree(new[]
+            {
+                new IfExpression(new ConstantExpression(1), new IExpression[]
+                {
+                    new OutputExpression(new ConstantExpression(1)),
+                }, new IExpression[]
+                {
+                    new OutputExpression(new ConstantExpression(2)),
+                })
+            });
+
+            var result = new JsTranspiler().Transpile(tree);
+            var expected = "if (1) { console.info(1) } else { console.info(2) }";
 
             Assert.AreEqual(expected.RemoveNonPrintableChras(), result.RemoveNonPrintableChras());
         }
