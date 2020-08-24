@@ -96,12 +96,27 @@ namespace RockstarLangTranspiler
             while(!(nextToken is EndOfFileToken || nextToken is ElseToken || _tokens[nextTokenPosition + 1] is EndOfTheLineToken))
             {
                 var (inner, nextInner) = CreateExpressionBranch(nextTokenPosition);
-                inners.Add(inner);
+                if (inner != null)
+                    inners.Add(inner);
                 nextToken = _tokens[nextInner];
                 nextTokenPosition = nextInner;
             }
 
-            return (new IfExpression(conditionExpression, inners), nextTokenPosition);
+            var elseExpressions = new List<IExpression>();
+            if (nextToken is ElseToken)
+            {
+                nextTokenPosition++;
+                while (!(nextToken is EndOfFileToken ||  _tokens[nextTokenPosition + 1] is EndOfTheLineToken))
+                {
+                    var (inner, nextInner) = CreateExpressionBranch(nextTokenPosition);
+                    if (inner != null)
+                        elseExpressions.Add(inner);
+                    nextToken = _tokens[nextInner];
+                    nextTokenPosition = nextInner;
+                }
+            }
+
+            return (new IfExpression(conditionExpression, inners, elseExpressions), nextTokenPosition);
         }
 
         private (VariableAssigmentExpression, int) CreateAssigmentExpression(int currentTokenPosition)
