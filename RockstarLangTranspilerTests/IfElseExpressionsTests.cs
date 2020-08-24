@@ -155,5 +155,40 @@ namespace RockstarLangTranspilerTests
             var innerElse = elseExpressions.Single() as OutputExpression;
             Assert.IsNotNull(innerElse);
         }
+
+        [TestMethod]
+        public void IfElseExpressionUntilEndOfBlock()
+        {
+            var tokens = new Token[]
+            {
+                new IfToken(0, 0, "if"),
+                new NumberToken(0, 0, "1"),
+                new EndOfTheLineToken(0),
+                    new OutputToken(0, 0, "say"),
+                    new NumberToken(0, 0, "1"),
+                    new EndOfTheLineToken(0),
+                new ElseToken(0, 0, "else"),
+                    new OutputToken(0, 0, "say"),
+                    new NumberToken(0, 0, "2"),
+                    new EndOfTheLineToken(0),
+                    new OutputToken(0, 0, "say"),
+                    new NumberToken(0, 0, "3"),
+                    new EndOfTheLineToken(0),
+                new EndOfTheLineToken(0),
+            };
+
+            var parser = new Parser(tokens);
+            var result = parser.Parse().RootExpressions.ToArray();
+
+            Assert.AreEqual(1, result.Length);
+            var ifExpression = result[0] as IfExpression;
+            Assert.IsNotNull(ifExpression);
+            Assert.AreEqual(1, ifExpression.InnerExpressions.Count());
+
+            var elseExpressions = ifExpression.ElseExpressions;
+            Assert.AreEqual(2, elseExpressions.Count());
+            Assert.IsNotNull(elseExpressions.First() as OutputExpression);
+            Assert.IsNotNull(elseExpressions.Last() as OutputExpression);
+        }
     }
 }
