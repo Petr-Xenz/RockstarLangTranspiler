@@ -2,7 +2,7 @@
   "profiles": {
     "RockstarLangTranspiler": {
       "commandName": "Project",
-      "commandLineArgs": "test.rock"
+      "commandLineArgs": "test.rock test.js"
     }
   }
 }
