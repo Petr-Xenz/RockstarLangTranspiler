@@ -11,7 +11,7 @@ namespace RockstarLangTranspiler
     public class Parser
     {
         private readonly Token[] _tokens;
-        private readonly Dictionary<int, IExpression> _tokenPositionToExpression = new Dictionary<int, IExpression>(); 
+        private readonly Dictionary<(int linePosition, int lineNumber), IExpression> _tokenPositionToExpression = new Dictionary<(int, int), IExpression>(); 
 
         public Parser(IEnumerable<Token> tokens)
         {
@@ -57,7 +57,7 @@ namespace RockstarLangTranspiler
                 _ => throw new ArgumentException(),
             };
 
-            _tokenPositionToExpression[currentTokenPosition] = expression.expression;
+            _tokenPositionToExpression[(token.LinePosition, token.LineNumber)] = expression.expression;
 
             return expression;
 
