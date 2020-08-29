@@ -42,7 +42,7 @@ namespace RockstarLangTranspiler
                 result.Add(new EndOfTheLineToken(line.Length, lineNumber + 1));
 
             }
-            result.Add(new EndOfTheLineToken(0, lines.Length));
+            result.Add(new EndOfFileToken(0, lines.Length));            
             return result;
         }
     }
