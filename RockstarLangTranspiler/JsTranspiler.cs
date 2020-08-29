@@ -1,6 +1,5 @@
 ﻿using RockstarLangTranspiler.Expressions;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,6 +21,7 @@ namespace RockstarLangTranspiler
             {
                 OutputExpression output => CreateConsoleInfoExpression(output),
                 ConstantExpression constant => CreateConstantExpression(constant),
+                BooleanExpression boolean => CreateBooleanExpression(boolean),
                 VariableExpression variable => CreateVariableExpression(variable),
                 AdditionExpression addition => CreateAdditionExpression(addition),
                 VariableAssigmentExpression assigment => CreateAssigmentExpression(assigment),
@@ -100,6 +100,9 @@ namespace RockstarLangTranspiler
 
         private string CreateAssigmentExpression(VariableAssigmentExpression assigment) 
             => $"let {assigment.VariableName} = {TranspileExpression(assigment.AssigmentExpression)}";
+
+        private string CreateBooleanExpression(BooleanExpression boolean)
+            => boolean.Value ? "true" : "false";
 
         private string CreateConstantExpression(ConstantExpression constant) 
             => constant.Value.ToString();

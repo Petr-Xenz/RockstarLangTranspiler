@@ -191,7 +191,7 @@ namespace RockstarLangTranspilerTests
         {
             var tree = new SyntaxTree(new[]
 {
-                new WhileExpression(new ConstantExpression(1), new IExpression[]
+                new WhileExpression(new BooleanExpression(true), new IExpression[]
                 {
                     new OutputExpression(new ConstantExpression(1)),
                     new OutputExpression(new ConstantExpression(1)),
@@ -199,7 +199,7 @@ namespace RockstarLangTranspilerTests
             });
 
             var result = new JsTranspiler().Transpile(tree);
-            var expected = "while (1) { console.info(1) console.info(1) }";
+            var expected = "while (true) { console.info(1) console.info(1) }";
 
             Assert.AreEqual(expected.RemoveNonPrintableChras(), result.RemoveNonPrintableChras());
         }

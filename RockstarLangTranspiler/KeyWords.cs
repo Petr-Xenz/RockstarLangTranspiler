@@ -13,9 +13,17 @@ namespace RockstarLangTranspiler
 
         public const string Undefined = "mysterious";
 
-        public const string True = "true";
+        public const string Ok = "ok";
 
-        public const string False = "false"; 
+        public const string Right = "right";
+
+        public const string Yes = "yes";
+
+        public const string Wrong = "wrong";
+
+        public const string No = "no";
+
+        public const string Lies = "lies";
 
         #endregion
 

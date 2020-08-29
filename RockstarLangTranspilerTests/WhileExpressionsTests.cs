@@ -15,7 +15,7 @@ namespace RockstarLangTranspilerTests
             var tokens = new Token[]
             {
                 new WhileToken(0, 0, "while"),
-                new NumberToken(0, 0, "1"),
+                new BooleanToken(0, 0, "right"),
                 new EndOfTheLineToken(0, 0),
                     new OutputToken(0, 0, "say"),
                     new NumberToken(0, 0, "1"),
@@ -29,7 +29,7 @@ namespace RockstarLangTranspilerTests
             Assert.IsTrue(tree.RootExpressions.Single() is WhileExpression);
             var we = (WhileExpression)tree.RootExpressions.Single();
 
-            Assert.IsTrue(we.ConditionExpression is ConstantExpression);
+            Assert.IsTrue(we.ConditionExpression is BooleanExpression be && be.Value == true);
             Assert.IsTrue(we.InnerExpressions.Single() is OutputExpression);
         }
 

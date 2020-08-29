@@ -1,4 +1,6 @@
-﻿namespace RockstarLangTranspiler.Expressions
+﻿using RockstarLangTranspiler.Tokens;
+
+namespace RockstarLangTranspiler.Expressions
 {
     public class ConstantExpression : IExpression
     {

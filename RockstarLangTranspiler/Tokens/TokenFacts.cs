@@ -1,5 +1,6 @@
 ﻿using RockstarLangTranspiler.Tokens;
 using System;
+using static RockstarLangTranspiler.KeyWords;
 
 namespace RockstarLangTranspiler.Expressions
 {
@@ -22,6 +23,20 @@ namespace RockstarLangTranspiler.Expressions
                 CommaToken _ => true,
                 FunctionArgumentSeparatorToken _ => true,
                 _ => false,
+            };
+        }
+
+        public static bool BooleanValue(this BooleanToken token)
+        {
+            return token.Value switch
+            {
+                Right => true,
+                Ok => true,
+                Yes => true,
+                Wrong => false,
+                No => false,
+                Lies => false,
+                _ => throw new NotSupportedException("unknown boolean literal"),
             };
         }
     }

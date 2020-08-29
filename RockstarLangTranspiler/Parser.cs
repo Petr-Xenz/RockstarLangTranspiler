@@ -44,6 +44,7 @@ namespace RockstarLangTranspiler
             (IExpression expression, int nextTokenPosition) expression = token switch
             {
                 NumberToken number => CreateConstantExpression(number, currentTokenPosition, isBackTracking),
+                BooleanToken boolean => CreateBooleanExpression(boolean, currentTokenPosition, isBackTracking),
                 AdditionToken _ => CreateAdditionExpression(currentTokenPosition),
                 OutputToken _ => CreateOutputExpression(currentTokenPosition),
                 AssigmentToken _ => CreateAssigmentExpression(currentTokenPosition),
@@ -62,11 +63,17 @@ namespace RockstarLangTranspiler
             return expression;
         }
 
+        private (IExpression, int) CreateBooleanExpression(BooleanToken boolean, int currentTokenPosition, bool isBackTracking) 
+            => CreateLiteralExpression(() => new BooleanExpression(boolean.BooleanValue()), currentTokenPosition, isBackTracking);
+
         private (IExpression, int) CreateConstantExpression(NumberToken number, int currentTokenPosition, bool isBackTracking)
+            => CreateLiteralExpression(() => new ConstantExpression(float.Parse(number.Value, CultureInfo.InvariantCulture)), currentTokenPosition, isBackTracking);
+
+        private (IExpression, int) CreateLiteralExpression(Func<IExpression> createExpression, int currentTokenPosition, bool isBackTracking)
         {
             var nextToken = PeekNextToken(currentTokenPosition);
             if (isBackTracking || !nextToken.IsCombiningToken())
-                return (new ConstantExpression(float.Parse(number.Value, CultureInfo.InvariantCulture)), currentTokenPosition + 1);
+                return (createExpression(), currentTokenPosition + 1);
             else
                 return CreateExpressionBranch(currentTokenPosition + 1);
         }
