@@ -185,6 +185,24 @@ namespace RockstarLangTranspilerTests
 
             Assert.AreEqual(expected.RemoveNonPrintableChras(), result.RemoveNonPrintableChras());
         }
+
+        [TestMethod]
+        public void TranspileWhileExpression()
+        {
+            var tree = new SyntaxTree(new[]
+{
+                new WhileExpression(new ConstantExpression(1), new IExpression[]
+                {
+                    new OutputExpression(new ConstantExpression(1)),
+                    new OutputExpression(new ConstantExpression(1)),
+                })
+            });
+
+            var result = new JsTranspiler().Transpile(tree);
+            var expected = "while (1) { console.info(1) console.info(1) }";
+
+            Assert.AreEqual(expected.RemoveNonPrintableChras(), result.RemoveNonPrintableChras());
+        }
     }
 
     public static class Extensions

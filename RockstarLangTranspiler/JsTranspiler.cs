@@ -28,8 +28,15 @@ namespace RockstarLangTranspiler
                 FunctionExpression function => CreateFunctionExpression(function),
                 FunctionInvocationExpression invokation => CreateFunctionInvocationExpression(invokation),
                 IfExpression ifExpression => CreateIfExpression(ifExpression),
+                WhileExpression whileExpression => CreateWhileExpression(whileExpression),
                 _ => throw new NotSupportedException(expression.GetType().FullName)
             };
+        }
+
+        private string CreateWhileExpression(WhileExpression whileExpression)
+        {
+            var inner = TranspileInnerExpressions(whileExpression.InnerExpressions);
+            return $"while ({TranspileExpression(whileExpression.ConditionExpression)}) {{\n {inner} \n}}";
         }
 
         private string CreateIfExpression(IfExpression ifExpression)
