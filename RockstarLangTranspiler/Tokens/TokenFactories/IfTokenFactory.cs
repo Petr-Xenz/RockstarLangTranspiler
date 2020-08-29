@@ -1,10 +1,12 @@
 ﻿using System.Collections.Generic;
 
+using static RockstarLangTranspiler.KeyWords;
+
 namespace RockstarLangTranspiler.Tokens.TokenFactories
 {
     public class IfTokenFactory : KeyWordBasedTokenFactory<IfToken>
     {
-        private static readonly string[] _keyWords = new[] { "if" };
+        private static readonly string[] _keyWords = new[] { If };
 
         public override IReadOnlyCollection<string> KeyWords => _keyWords;
 

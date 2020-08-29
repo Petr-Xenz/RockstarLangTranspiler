@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
+using static RockstarLangTranspiler.KeyWords;
 
 namespace RockstarLangTranspiler.Tokens.TokenFactories
 {
     public class WhileTokenFactory : KeyWordBasedTokenFactory<WhileToken>
     {
-        private static readonly string[] _keyWords = new[] { "while", "until" };
+        private static readonly string[] _keyWords = new[] { While, Until };
 
         public override IReadOnlyCollection<string> KeyWords => _keyWords;
 

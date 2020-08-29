@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
+using static RockstarLangTranspiler.KeyWords;
 
 namespace RockstarLangTranspiler.Tokens.TokenFactories
 {
     public class AssigmentTokenFactory : KeyWordBasedTokenFactory<AssigmentToken>
     {
-        public override IReadOnlyCollection<string> KeyWords => new []{ "let", "be", "is", "are", "was", "were", "put", "into" };
+        private static readonly string[] _keyWords = new[] { Let, Be, Is, Are, Was, Were, Put, Into };
+
+        public override IReadOnlyCollection<string> KeyWords => _keyWords;
 
         public override bool CanParseFarther(string value) => false;
 

@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
+using static RockstarLangTranspiler.KeyWords;
 
 namespace RockstarLangTranspiler.Tokens.TokenFactories
 {
     public class OutputTokenFactory : KeyWordBasedTokenFactory<OutputToken>
     {
-        private static string[] _keyWords = { "say", "whisper", "shout", "scream" };
+        private static string[] _keyWords = { Say, Whisper, Shout, Scream };
 
         public override IReadOnlyCollection<string> KeyWords => _keyWords;
 

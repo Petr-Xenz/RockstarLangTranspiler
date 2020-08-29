@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
+using static RockstarLangTranspiler.KeyWords;
 
 namespace RockstarLangTranspiler.Tokens.TokenFactories
 {
     public class ElseTokenFactory : KeyWordBasedTokenFactory<ElseToken>
     {
-        private static readonly string[] _keyWords = new[] { "else" };
+        private static readonly string[] _keyWords = new[] { Else };
 
         public override IReadOnlyCollection<string> KeyWords => _keyWords;
 

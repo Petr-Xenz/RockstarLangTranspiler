@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
+using static RockstarLangTranspiler.KeyWords;
 
 namespace RockstarLangTranspiler.Tokens.TokenFactories
 {
     public class FunctionInvocationTokenFactory : KeyWordBasedTokenFactory<FunctionInvocationToken>
     {
 
-        private static string[] _keyWords = new[] { "taking" };
+        private static string[] _keyWords = new[] { Taking };
 
         public override IReadOnlyCollection<string> KeyWords => _keyWords;
 

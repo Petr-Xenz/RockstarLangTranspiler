@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
+using static RockstarLangTranspiler.KeyWords;
 
 namespace RockstarLangTranspiler.Tokens.TokenFactories
 {
     public class FunctionArgumentSeparatorTokenFactory : KeyWordBasedTokenFactory<FunctionArgumentSeparatorToken>
     {
-        private static string[] _keyWords => new[] { "&", "'n'" };
+        private static string[] _keyWords => new[] { Ampersand, N };
 
         public override IReadOnlyCollection<string> KeyWords => _keyWords;
 
