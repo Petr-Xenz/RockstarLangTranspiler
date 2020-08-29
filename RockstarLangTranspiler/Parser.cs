@@ -60,28 +60,28 @@ namespace RockstarLangTranspiler
             _tokenPositionToExpression[(token.LinePosition, token.LineNumber)] = expression.expression;
 
             return expression;
+        }
 
-            (AdditionExpression, int) CreateAdditionExpression(int currentTokenPosition)
-            {
-                var (left, _) = CreateExpressionBranch(currentTokenPosition - 1, true);
-                var (right, next) = CreateExpressionBranch(currentTokenPosition + 1);
-                return (new AdditionExpression(left, right), next);
-            }
+        private (IExpression, int) CreateConstantExpression(NumberToken number, int currentTokenPosition, bool isBackTracking)
+        {
+            var nextToken = PeekNextToken(currentTokenPosition);
+            if (isBackTracking || !nextToken.IsCombiningToken())
+                return (new ConstantExpression(float.Parse(number.Value, CultureInfo.InvariantCulture)), currentTokenPosition + 1);
+            else
+                return CreateExpressionBranch(currentTokenPosition + 1);
+        }
 
-            (OutputExpression, int) CreateOutputExpression(int currentTokenPosition)
-            {
-                var nextExpression = CreateExpressionBranch(currentTokenPosition + 1);
-                return (new OutputExpression(nextExpression.expression), nextExpression.nextTokenPosition);
-            }
+        private (OutputExpression, int) CreateOutputExpression(int currentTokenPosition)
+        {
+            var nextExpression = CreateExpressionBranch(currentTokenPosition + 1);
+            return (new OutputExpression(nextExpression.expression), nextExpression.nextTokenPosition);
+        }
 
-            (IExpression, int) CreateConstantExpression(NumberToken number, int currentTokenPosition, bool isBackTracking)
-            {
-                var nextToken = PeekNextToken(currentTokenPosition);
-                if (isBackTracking || !nextToken.IsCombiningToken())
-                    return (new ConstantExpression(float.Parse(number.Value, CultureInfo.InvariantCulture)), currentTokenPosition + 1);
-                else 
-                      return CreateExpressionBranch(currentTokenPosition + 1);
-            }
+        private (AdditionExpression, int) CreateAdditionExpression(int currentTokenPosition)
+        {
+            var (left, _) = CreateExpressionBranch(currentTokenPosition - 1, true);
+            var (right, next) = CreateExpressionBranch(currentTokenPosition + 1);
+            return (new AdditionExpression(left, right), next);
         }
 
         private (WhileExpression, int) CreateWhileExpression(int currentTokenPosition)
