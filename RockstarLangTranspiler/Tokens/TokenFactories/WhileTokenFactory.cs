@@ -13,9 +13,9 @@ namespace RockstarLangTranspiler.Tokens.TokenFactories
             throw new System.NotImplementedException();
         }
 
-        public override WhileToken CreateToken(int startLocation, string value)
+        public override WhileToken CreateToken(int linePosition, int lineNumber, string value)
         {
-            return new WhileToken(startLocation, value.Length, value);
+            return new WhileToken(linePosition, lineNumber, value);
         }
     }
 }

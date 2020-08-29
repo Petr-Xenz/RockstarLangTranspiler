@@ -16,11 +16,11 @@ namespace RockstarLangTranspilerTests
             {
                 new WhileToken(0, 0, "while"),
                 new NumberToken(0, 0, "1"),
-                new EndOfTheLineToken(0),
+                new EndOfTheLineToken(0, 0),
                     new OutputToken(0, 0, "say"),
                     new NumberToken(0, 0, "1"),
-                    new EndOfTheLineToken(0),
-                new EndOfFileToken(0),
+                    new EndOfTheLineToken(0, 0),
+                new EndOfFileToken(0, 0),
             };
 
             var parser = new Parser(tokens);
@@ -40,15 +40,15 @@ namespace RockstarLangTranspilerTests
             {
                 new WhileToken(0, 0, "while"),
                 new NumberToken(0, 0, "1"),
-                new EndOfTheLineToken(0),
+                new EndOfTheLineToken(0, 0),
                     new OutputToken(0, 0, "say"),
                     new NumberToken(0, 0, "1"),
-                    new EndOfTheLineToken(0),
-                new EndOfTheLineToken(0),
+                    new EndOfTheLineToken(0, 0),
+                new EndOfTheLineToken(0, 0),
 
                 new OutputToken(0, 0, "say"),
                 new NumberToken(0, 0, "1"),
-                new EndOfTheLineToken(0),
+                new EndOfTheLineToken(0, 0),
             };
 
             var parser = new Parser(tokens);
@@ -70,11 +70,11 @@ namespace RockstarLangTranspilerTests
                 new NumberToken(0, 0, "1"),
                 new AdditionToken(0, 0, "plus"),
                 new NumberToken(0, 0, "1"),
-                new EndOfTheLineToken(0),
+                new EndOfTheLineToken(0, 0),
                     new OutputToken(0, 0, "say"),
                     new NumberToken(0, 0, "1"),
-                    new EndOfTheLineToken(0),
-                new EndOfFileToken(0),
+                    new EndOfTheLineToken(0, 0),
+                new EndOfFileToken(0, 0),
             };
 
             var parser = new Parser(tokens);
@@ -96,14 +96,14 @@ namespace RockstarLangTranspilerTests
                 new NumberToken(0, 0, "1"),
                 new AdditionToken(0, 0, "plus"),
                 new NumberToken(0, 0, "1"),
-                new EndOfTheLineToken(0),
+                new EndOfTheLineToken(0, 0),
                     new OutputToken(0, 0, "say"),
                     new NumberToken(0, 0, "1"),
-                    new EndOfTheLineToken(0),
+                    new EndOfTheLineToken(0, 0),
                     new OutputToken(0, 0, "say"),
                     new NumberToken(0, 0, "1"),
-                    new EndOfTheLineToken(0),
-                new EndOfFileToken(0),
+                    new EndOfTheLineToken(0, 0),
+                new EndOfFileToken(0, 0),
             };
 
             var parser = new Parser(tokens);

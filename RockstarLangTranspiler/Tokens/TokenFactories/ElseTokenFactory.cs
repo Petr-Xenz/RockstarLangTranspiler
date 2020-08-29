@@ -13,9 +13,9 @@ namespace RockstarLangTranspiler.Tokens.TokenFactories
             throw new System.NotImplementedException();
         }
 
-        public override ElseToken CreateToken(int startLocation, string value)
+        public override ElseToken CreateToken(int linePosition, int lineNumber, string value)
         {
-            return new ElseToken(startLocation, value.Length, value);
+            return new ElseToken(linePosition, lineNumber, value);
         }
     }
 }

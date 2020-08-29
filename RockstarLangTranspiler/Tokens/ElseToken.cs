@@ -2,7 +2,7 @@
 {
     public class ElseToken : Token
     {
-        public ElseToken(int startLocation, int length, string value) : base(startLocation, length, value)
+        public ElseToken(int linePosition, int lineNumber, string value) : base(linePosition, lineNumber, value)
         {
         }
     }

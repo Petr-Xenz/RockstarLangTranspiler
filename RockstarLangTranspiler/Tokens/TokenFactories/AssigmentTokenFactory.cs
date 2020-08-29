@@ -9,9 +9,9 @@ namespace RockstarLangTranspiler.Tokens.TokenFactories
 
         public override bool CanParseFarther(string value) => false;
 
-        public override AssigmentToken CreateToken(int startLocation, string value)
+        public override AssigmentToken CreateToken(int linePosition, int lineNumber, string value)
         {
-            return new AssigmentToken(startLocation, value.Length, value);
+            return new AssigmentToken(linePosition, lineNumber, value);
         }
 
     }

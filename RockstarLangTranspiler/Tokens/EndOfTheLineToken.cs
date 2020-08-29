@@ -4,7 +4,7 @@ namespace RockstarLangTranspiler.Tokens
 {
     public sealed class EndOfTheLineToken : Token
     {
-        public EndOfTheLineToken(int startLocation) : base (startLocation, Environment.NewLine.Length, Environment.NewLine)
+        public EndOfTheLineToken(int linePosition, int lineNumber) : base (linePosition, lineNumber, Environment.NewLine)
         {
 
         }

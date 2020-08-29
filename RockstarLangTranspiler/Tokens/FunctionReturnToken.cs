@@ -2,7 +2,7 @@
 {
     public class FunctionReturnToken : Token
     {
-        public FunctionReturnToken(int startLocation, int length, string value) : base(startLocation, length, value)
+        public FunctionReturnToken(int linePosition, int lineNumber, string value) : base(linePosition, lineNumber, value)
         {
         }
     }

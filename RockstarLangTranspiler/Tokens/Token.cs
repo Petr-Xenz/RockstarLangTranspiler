@@ -2,14 +2,18 @@
 {
     public abstract class Token
     {
-        protected Token(int startLocation, int length, string value)
+        protected Token(int linePosition, int lineNumber, string value)
         {
-            StartLocation = startLocation;
-            Length = length;
+            LinePosition = linePosition;
+            LineNumber = lineNumber;
+            Length = value.Length;
             Value = value;
+
         }
 
-        public int StartLocation { get; }
+        public int LinePosition { get; }
+
+        public int LineNumber { get; }
 
         public int Length { get; }
 

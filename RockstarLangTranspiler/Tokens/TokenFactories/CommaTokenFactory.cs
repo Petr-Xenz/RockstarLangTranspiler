@@ -13,6 +13,6 @@ namespace RockstarLangTranspiler.Tokens.TokenFactories
             throw new System.NotImplementedException();
         }
 
-        public override CommaToken CreateToken(int startLocation, string value) => new CommaToken(startLocation, 1);
+        public override CommaToken CreateToken(int linePosition, int lineNumber, string value) => new CommaToken(linePosition, lineNumber);
     }
 }

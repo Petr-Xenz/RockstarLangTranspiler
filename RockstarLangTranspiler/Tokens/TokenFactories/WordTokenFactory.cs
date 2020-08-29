@@ -13,9 +13,9 @@ namespace RockstarLangTranspiler.Tokens.TokenFactories
             return true;
         }
 
-        public WordToken CreateToken(int startLocation, string value)
+        public WordToken CreateToken(int linePosition, int lineNumber, string value)
         {
-            return new WordToken(startLocation, value.Length, value);
+            return new WordToken(linePosition, lineNumber, value);
         }
 
         public bool IsValidForToken(string value)

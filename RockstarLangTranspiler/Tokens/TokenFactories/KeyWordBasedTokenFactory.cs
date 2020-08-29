@@ -9,7 +9,7 @@ namespace RockstarLangTranspiler.Tokens.TokenFactories
 
         public abstract bool CanParseFarther(string value);
 
-        public abstract T CreateToken(int startLocation, string value);
+        public abstract T CreateToken(int linePosition, int lineNumber, string value);
 
         public bool IsValidForToken(string value) 
             => KeyWords.Any(w => w.Equals(value, System.StringComparison.OrdinalIgnoreCase));

@@ -13,7 +13,7 @@ namespace RockstarLangTranspiler.Tokens.TokenFactories
             throw new System.NotImplementedException();
         }
 
-        public override FunctionArgumentSeparatorToken CreateToken(int startLocation, string value) 
-            => new FunctionArgumentSeparatorToken(startLocation, value.Length, value);
+        public override FunctionArgumentSeparatorToken CreateToken(int linePosition, int lineNumber, string value) 
+            => new FunctionArgumentSeparatorToken(linePosition, lineNumber, value);
     }
 }

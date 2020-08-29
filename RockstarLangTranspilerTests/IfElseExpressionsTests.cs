@@ -16,10 +16,10 @@ namespace RockstarLangTranspilerTests
             {
                 new IfToken(0, 0, "if"),
                 new NumberToken(0, 0, "1"),
-                new EndOfTheLineToken(0),
+                new EndOfTheLineToken(0, 0),
                     new OutputToken(0, 0, "say"),
                     new NumberToken(0, 0, "1"),
-                new EndOfFileToken(0),
+                new EndOfFileToken(0, 0),
             };
 
             var parser = new Parser(tokens);
@@ -44,10 +44,10 @@ namespace RockstarLangTranspilerTests
                 new NumberToken(0, 0, "1"),
                 new AdditionToken(0, 0, "plus"),
                 new NumberToken(0, 0, "2"),
-                new EndOfTheLineToken(0),
+                new EndOfTheLineToken(0, 0),
                     new OutputToken(0, 0, "say"),
                     new NumberToken(0, 0, "1"),
-                new EndOfFileToken(0),
+                new EndOfFileToken(0, 0),
             };
 
             var parser = new Parser(tokens);
@@ -70,11 +70,11 @@ namespace RockstarLangTranspilerTests
             {
                 new IfToken(0, 0, "if"),
                 new NumberToken(0, 0, "1"),
-                new EndOfTheLineToken(0),
+                new EndOfTheLineToken(0, 0),
                     new OutputToken(0, 0, "say"),
                     new NumberToken(0, 0, "1"),
-                    new EndOfTheLineToken(0),
-                new EndOfTheLineToken(0),
+                    new EndOfTheLineToken(0, 0),
+                new EndOfTheLineToken(0, 0),
             };
 
             var parser = new Parser(tokens);
@@ -97,12 +97,12 @@ namespace RockstarLangTranspilerTests
             {
                 new IfToken(0, 0, "if"),
                 new NumberToken(0, 0, "1"),
-                new EndOfTheLineToken(0),
+                new EndOfTheLineToken(0, 0),
                     new OutputToken(0, 0, "say"),
                     new NumberToken(0, 0, "1"),
                     new OutputToken(0, 0, "say"),
                     new NumberToken(0, 0, "2"),
-                new EndOfFileToken(0),
+                new EndOfFileToken(0, 0),
             };
 
             var parser = new Parser(tokens);
@@ -131,15 +131,15 @@ namespace RockstarLangTranspilerTests
             {
                 new IfToken(0, 0, "if"),
                 new NumberToken(0, 0, "1"),
-                new EndOfTheLineToken(0),
+                new EndOfTheLineToken(0, 0),
                     new OutputToken(0, 0, "say"),
                     new NumberToken(0, 0, "1"),
-                    new EndOfTheLineToken(0),
+                    new EndOfTheLineToken(0, 0),
                 new ElseToken(0, 0, "else"),
                     new OutputToken(0, 0, "say"),
                     new NumberToken(0, 0, "2"),
-                    new EndOfTheLineToken(0),
-                new EndOfFileToken(0),
+                    new EndOfTheLineToken(0, 0),
+                new EndOfFileToken(0, 0),
             };
 
             var parser = new Parser(tokens);
@@ -163,18 +163,18 @@ namespace RockstarLangTranspilerTests
             {
                 new IfToken(0, 0, "if"),
                 new NumberToken(0, 0, "1"),
-                new EndOfTheLineToken(0),
+                new EndOfTheLineToken(0, 0),
                     new OutputToken(0, 0, "say"),
                     new NumberToken(0, 0, "1"),
-                    new EndOfTheLineToken(0),
+                    new EndOfTheLineToken(0, 0),
                 new ElseToken(0, 0, "else"),
                     new OutputToken(0, 0, "say"),
                     new NumberToken(0, 0, "2"),
-                    new EndOfTheLineToken(0),
+                    new EndOfTheLineToken(0, 0),
                     new OutputToken(0, 0, "say"),
                     new NumberToken(0, 0, "3"),
-                    new EndOfTheLineToken(0),
-                new EndOfTheLineToken(0),
+                    new EndOfTheLineToken(0, 0),
+                new EndOfTheLineToken(0, 0),
             };
 
             var parser = new Parser(tokens);

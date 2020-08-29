@@ -2,7 +2,7 @@
 {
     public class NumberToken : Token
     {
-        public NumberToken(int startLocation, int length, string value) : base(startLocation, length, value)
+        public NumberToken(int linePosition, int lineNumber, string value) : base(linePosition, lineNumber, value)
         {
         }
     }

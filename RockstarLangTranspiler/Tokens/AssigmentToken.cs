@@ -2,7 +2,7 @@
 {
     public class AssigmentToken : Token
     {
-        public AssigmentToken(int startLocation, int length, string value) : base(startLocation, length, value)
+        public AssigmentToken(int linePosition, int lineNumber, string value) : base(linePosition, lineNumber, value)
         {
         }
     }

@@ -29,19 +29,20 @@ namespace RockstarLangTranspiler
         {
             var result = new List<Token>();
             var lines = _file.Split(Environment.NewLine);
-            foreach(var line in lines)
+            for (int lineNumber = 0; lineNumber < lines.Length; lineNumber++)
             {
+                var line = lines[lineNumber];
                 var words = line.SplitLineByWords();
                 foreach(var wordWithPosition in words)
                 {
                     var factory = _tokenFactories.FirstOrDefault(f => f.IsValidForToken(wordWithPosition.word));
-                    result.Add(factory?.CreateToken(wordWithPosition.position, wordWithPosition.word)
+                    result.Add(factory?.CreateToken(wordWithPosition.position, lineNumber + 1, wordWithPosition.word)
                         ?? new UnknownToken(wordWithPosition.position, wordWithPosition.word.Length, wordWithPosition.word));
                 }
-                result.Add(new EndOfTheLineToken(line.Length));
+                result.Add(new EndOfTheLineToken(line.Length, lineNumber + 1));
 
             }
-            result.Add(new EndOfTheLineToken(0));
+            result.Add(new EndOfTheLineToken(0, lines.Length));
             return result;
         }
     }

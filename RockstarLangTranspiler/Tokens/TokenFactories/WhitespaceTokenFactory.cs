@@ -10,9 +10,9 @@ namespace RockstarLangTranspiler.Tokens.TokenFactories
         public bool CanParseFarther(string value) 
             => value.Length > 0 && string.IsNullOrWhiteSpace(value);
 
-        public WhitespaceToken CreateToken(int startLocation, string value)
+        public WhitespaceToken CreateToken(int linePosition, int lineNumber, string value)
         {
-            return new WhitespaceToken(startLocation);
+            return new WhitespaceToken(linePosition, lineNumber);
         }
 
         public bool IsValidForToken(string value) => value == " ";

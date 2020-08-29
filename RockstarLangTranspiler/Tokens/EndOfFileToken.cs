@@ -2,7 +2,7 @@
 {
     public class EndOfFileToken : Token
     {
-        public EndOfFileToken(int startLocation) : base(startLocation, 0, "")
+        public EndOfFileToken(int linePosition, int lineNumber) : base(linePosition, lineNumber, "")
         {
         }
     }

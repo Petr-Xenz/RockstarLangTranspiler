@@ -22,7 +22,7 @@ namespace RockstarLangTranspilerTests
             var sheToken = new PronounToken(0, 3, "she");
 
             Assert.AreEqual(sheToken.Length, pronounceTokens[0].Length);
-            Assert.AreEqual(sheToken.StartLocation, pronounceTokens[0].StartLocation);
+            Assert.AreEqual(sheToken.LinePosition, pronounceTokens[0].LinePosition);
             Assert.AreEqual(sheToken.Value, pronounceTokens[0].Value);
         }
     }

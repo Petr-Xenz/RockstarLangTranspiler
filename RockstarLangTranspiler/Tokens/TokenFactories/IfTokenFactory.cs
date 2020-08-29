@@ -13,9 +13,9 @@ namespace RockstarLangTranspiler.Tokens.TokenFactories
             throw new System.NotImplementedException();
         }
 
-        public override IfToken CreateToken(int startLocation, string value)
+        public override IfToken CreateToken(int linePosition, int lineNumber, string value)
         {
-            return new IfToken(startLocation, value.Length, value);
+            return new IfToken(linePosition, lineNumber, value);
         }
     }
 }

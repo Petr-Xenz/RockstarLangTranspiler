@@ -2,7 +2,7 @@
 {
     public class OutputToken : Token
     {
-        public OutputToken(int startLocation, int length, string value) : base(startLocation, length, value)
+        public OutputToken(int linePosition, int lineNumber, string value) : base(linePosition, lineNumber, value)
         {
         }
     }

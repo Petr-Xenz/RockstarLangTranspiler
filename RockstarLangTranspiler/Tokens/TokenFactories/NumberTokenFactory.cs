@@ -11,9 +11,9 @@ namespace RockstarLangTranspiler.Tokens.TokenFactories
         public bool CanParseFarther(string value) 
             => value.EndsWith('.') || IsValidForToken(value);
 
-        public NumberToken CreateToken(int startLocation, string value)
+        public NumberToken CreateToken(int linePosition, int lineNumber, string value)
         {
-            return new NumberToken(startLocation, value.Length, value);
+            return new NumberToken(linePosition, lineNumber, value);
         }
 
         public bool IsValidForToken(string value) => float.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out _);

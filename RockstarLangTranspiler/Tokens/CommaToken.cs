@@ -2,7 +2,7 @@
 {
     public class CommaToken : Token
     {
-        public CommaToken(int startLocation, int length) : base(startLocation, length, ",")
+        public CommaToken(int linePosition, int lineNumber) : base(linePosition, lineNumber, ",")
         {
         }
     }

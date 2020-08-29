@@ -13,6 +13,6 @@ namespace RockstarLangTranspiler.Tokens.TokenFactories
             throw new System.NotImplementedException();
         }
 
-        public override AndToken CreateToken(int startLocation, string value) => new AndToken(startLocation, 3, value);
+        public override AndToken CreateToken(int linePosition, int lineNumber, string value) => new AndToken(linePosition, lineNumber, value);
     }
 }

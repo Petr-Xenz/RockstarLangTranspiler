@@ -312,7 +312,7 @@ namespace RockstarLangTranspiler
         private Token PeekNextToken(int currentTokenPosition)
         {
             return currentTokenPosition + 1 == _tokens.Length 
-                ? new EndOfFileToken(currentTokenPosition + 1) 
+                ? new EndOfFileToken(currentTokenPosition + 1, _tokens.Last().LineNumber + 1) 
                 : _tokens[currentTokenPosition + 1];
         }
     }

@@ -2,7 +2,7 @@
 {
     public class WhileToken : Token
     {
-        public WhileToken(int startLocation, int length, string value) : base(startLocation, length, value)
+        public WhileToken(int linePosition, int lineNumber, string value) : base(linePosition, lineNumber, value)
         {
         }
     }

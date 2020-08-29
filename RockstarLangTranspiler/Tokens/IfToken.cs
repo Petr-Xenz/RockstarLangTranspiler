@@ -2,7 +2,7 @@
 {
     public class IfToken : Token
     {
-        public IfToken(int startLocation, int length, string value) : base(startLocation, length, value)
+        public IfToken(int linePosition, int lineNumber, string value) : base(linePosition, lineNumber, value)
         {
         }
     }

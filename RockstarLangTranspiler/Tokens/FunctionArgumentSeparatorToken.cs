@@ -2,7 +2,7 @@
 {
     public class FunctionArgumentSeparatorToken : Token
     {
-        public FunctionArgumentSeparatorToken(int startLocation, int length, string value) : base(startLocation, length, value)
+        public FunctionArgumentSeparatorToken(int linePosition, int lineNumber, string value) : base(linePosition, lineNumber, value)
         {
         }
     }

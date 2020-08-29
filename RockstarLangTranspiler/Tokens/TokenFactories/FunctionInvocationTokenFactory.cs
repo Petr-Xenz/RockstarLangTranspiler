@@ -14,7 +14,7 @@ namespace RockstarLangTranspiler.Tokens.TokenFactories
             throw new System.NotImplementedException();
         }
 
-        public override FunctionInvocationToken CreateToken(int startLocation, string value)
+        public override FunctionInvocationToken CreateToken(int linePosition, int lineNumber, string value)
         {
             return new FunctionInvocationToken(0, value.Length, value);
         }

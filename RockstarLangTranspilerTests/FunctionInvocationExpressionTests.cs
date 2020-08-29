@@ -17,7 +17,7 @@ namespace RockstarLangTranspilerTests
                 new WordToken(0, 0, "func"),
                 new FunctionInvocationToken(0, 0, "taking"),
                 new NumberToken(0, 0, "3"),
-                new EndOfTheLineToken(0),
+                new EndOfTheLineToken(0, 0),
             };
 
             var parser = new Parser(tokens);
@@ -46,7 +46,7 @@ namespace RockstarLangTranspilerTests
                 new NumberToken(0, 0, "3.2"),
                 new FunctionArgumentSeparatorToken(0, 0, "&"),
                 new WordToken(0, 0, "y"),
-                new EndOfTheLineToken(0),
+                new EndOfTheLineToken(0, 0),
             };
 
             var parser = new Parser(tokens);
@@ -76,7 +76,7 @@ namespace RockstarLangTranspilerTests
                 new WordToken(0, 0, "func"),
                 new FunctionInvocationToken(0, 0, "taking"),
                 new NumberToken(0, 0, "3"),
-                new EndOfTheLineToken(0),
+                new EndOfTheLineToken(0, 0),
             };
 
             var parser = new Parser(tokens);
@@ -107,7 +107,7 @@ namespace RockstarLangTranspilerTests
                 new NumberToken(0, 0, "3"),
                 new AssigmentToken(0, 0, "into"),
                 new WordToken(0, 0, "var"),
-                new EndOfTheLineToken(0),
+                new EndOfTheLineToken(0, 0),
             };
 
             var parser = new Parser(tokens);

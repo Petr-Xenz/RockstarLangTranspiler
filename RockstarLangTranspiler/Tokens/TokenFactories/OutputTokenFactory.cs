@@ -11,9 +11,9 @@ namespace RockstarLangTranspiler.Tokens.TokenFactories
 
         public override bool CanParseFarther(string value) => false;
 
-        public override OutputToken CreateToken(int startLocation, string value)
+        public override OutputToken CreateToken(int linePosition, int lineNumber, string value)
         {
-            return new OutputToken(startLocation, value.Length, value);
+            return new OutputToken(linePosition, lineNumber, value);
         }
     }
 }

@@ -16,7 +16,7 @@ namespace RockstarLangTranspiler.Tokens.TokenFactories
 
         public override bool CanParseFarther(string value) => false;
 
-        public override PronounToken CreateToken(int startLocation, string value) => new PronounToken(startLocation, value.Length, value);
+        public override PronounToken CreateToken(int linePosition, int lineNumber, string value) => new PronounToken(linePosition, lineNumber, value);
 
     }
 }

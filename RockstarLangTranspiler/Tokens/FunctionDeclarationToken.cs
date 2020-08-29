@@ -2,7 +2,7 @@
 {
     public class FunctionDeclarationToken : Token
     {
-        public FunctionDeclarationToken(int startLocation, int length, string value) : base(startLocation, length, value)
+        public FunctionDeclarationToken(int linePosition, int lineNumber, string value) : base(linePosition, lineNumber, value)
         {
         }
     }

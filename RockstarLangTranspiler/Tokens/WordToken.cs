@@ -2,7 +2,7 @@
 {
     public class WordToken : Token
     {
-        public WordToken(int startLocation, int length, string value) : base(startLocation, length, value)
+        public WordToken(int linePosition, int lineNumber, string value) : base(linePosition, lineNumber, value)
         {
         }
     }
