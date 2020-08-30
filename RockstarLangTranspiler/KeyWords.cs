@@ -37,6 +37,12 @@ namespace RockstarLangTranspiler
 
         public const string Without = "without";
 
+        public const string Times = "times";
+
+        public const string Of = "of";
+
+        public const string Over = "over";
+
         #endregion
 
         public const string And = "and";

@@ -25,6 +25,8 @@ namespace RockstarLangTranspiler
                 VariableExpression variable => CreateVariableExpression(variable),
                 AdditionExpression addition => CreateAdditionExpression(addition),
                 SubtractionExpression subtraction => CreateSubtractionExpression(subtraction),
+                MultiplicationExpression multiplication => CreateMultiplicationExpression(multiplication),
+                DivisionExpression division => CreateDivisionExpression(division),
                 VariableAssigmentExpression assigment => CreateAssigmentExpression(assigment),
                 FunctionExpression function => CreateFunctionExpression(function),
                 FunctionInvocationExpression invokation => CreateFunctionInvocationExpression(invokation),
@@ -116,5 +118,11 @@ namespace RockstarLangTranspiler
 
         private string CreateSubtractionExpression(SubtractionExpression addition)
             => $"{TranspileExpression(addition.Left)} - {TranspileExpression(addition.Right)}";
+
+        private string CreateMultiplicationExpression(MultiplicationExpression addition)
+            => $"{TranspileExpression(addition.Left)} * {TranspileExpression(addition.Right)}";
+
+        private string CreateDivisionExpression(DivisionExpression addition)
+            => $"{TranspileExpression(addition.Left)} / {TranspileExpression(addition.Right)}";
     }
 }

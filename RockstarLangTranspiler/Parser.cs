@@ -45,8 +45,10 @@ namespace RockstarLangTranspiler
             {
                 NumberToken number => CreateConstantExpression(number, currentTokenPosition, isBackTracking),
                 BooleanToken boolean => CreateBooleanExpression(boolean, currentTokenPosition, isBackTracking),
-                AdditionToken _ => CreateAdditionExpression(currentTokenPosition),
-                SubtractionToken _ => CreateSubtractionExpression(currentTokenPosition),
+                AdditionToken _ => CreateCompoundExpression((l, r) => new AdditionExpression(l, r), currentTokenPosition),
+                SubtractionToken _ => CreateCompoundExpression((l, r) => new SubtractionExpression(l, r), currentTokenPosition),
+                MultiplicationToken _ => CreateCompoundExpression((l, r) => new MultiplicationExpression(l, r), currentTokenPosition),
+                DivisionToken _ => CreateCompoundExpression((l, r) => new DivisionExpression(l, r), currentTokenPosition),
                 OutputToken _ => CreateOutputExpression(currentTokenPosition),
                 AssigmentToken _ => CreateAssigmentExpression(currentTokenPosition),
                 IfToken _ => CreateConditionExpression(currentTokenPosition),
@@ -85,18 +87,11 @@ namespace RockstarLangTranspiler
             return (new OutputExpression(nextExpression.expression), nextExpression.nextTokenPosition);
         }
 
-        private (AdditionExpression, int) CreateAdditionExpression(int currentTokenPosition)
+        private (T, int) CreateCompoundExpression<T>(Func<IExpression, IExpression, T> ctor, int currentTokenPosition)
         {
             var (left, _) = CreateExpressionBranch(currentTokenPosition - 1, true);
             var (right, next) = CreateExpressionBranch(currentTokenPosition + 1);
-            return (new AdditionExpression(left, right), next);
-        }
-
-        private (SubtractionExpression, int) CreateSubtractionExpression(int currentTokenPosition)
-        {
-            var (left, _) = CreateExpressionBranch(currentTokenPosition - 1, true);
-            var (right, next) = CreateExpressionBranch(currentTokenPosition + 1);
-            return (new SubtractionExpression(left, right), next);
+            return (ctor(left, right), next);
         }
 
         private (WhileExpression, int) CreateWhileExpression(int currentTokenPosition)

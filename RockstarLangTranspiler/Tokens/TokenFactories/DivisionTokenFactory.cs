@@ -3,16 +3,16 @@ using static RockstarLangTranspiler.KeyWords;
 
 namespace RockstarLangTranspiler.Tokens.TokenFactories
 {
-    public class AdditionTokenFactory : KeyWordBasedTokenFactory<AdditionToken>
+    public class DivisionTokenFactory : KeyWordBasedTokenFactory<DivisionToken>
     {
-        private static readonly string[] _keyWords = { Plus, With };
+        private static readonly string[] _keyWords = { Over };
         public override IReadOnlyCollection<string> KeyWords => _keyWords;
 
         public override bool CanParseFarther(string value) => false;
 
-        public override AdditionToken CreateToken(int linePosition, int lineNumber, string value)
+        public override DivisionToken CreateToken(int linePosition, int lineNumber, string value)
         {
-            return new AdditionToken(linePosition, lineNumber, value);
+            return new DivisionToken(linePosition, lineNumber, value);
         }
     }
 }
