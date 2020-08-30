@@ -29,6 +29,16 @@ namespace RockstarLangTranspilerTests
         }
 
         [TestMethod]
+        public void TranspileSubtractionExpression()
+        {
+            var tree = new SyntaxTree(new[] { new SubtractionExpression(new ConstantExpression(5), new ConstantExpression(2)) });
+            var transpiler = new JsTranspiler();
+            var result = transpiler.Transpile(tree);
+
+            Assert.AreEqual("5 - 2", result);
+        }
+
+        [TestMethod]
         public void TranspileOutputWithAddition()
         {
             var tree = new SyntaxTree(new[]

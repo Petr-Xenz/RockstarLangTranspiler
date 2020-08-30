@@ -1,6 +1,6 @@
 ﻿namespace RockstarLangTranspiler.Tokens
 {
-    public class AdditionToken : Token
+    public class AdditionToken : CombiningToken
     {
         public AdditionToken(int linePosition, int lineNumber, string value) : base(linePosition, lineNumber, value)
         {

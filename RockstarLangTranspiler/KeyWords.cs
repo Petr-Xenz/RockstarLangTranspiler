@@ -27,11 +27,15 @@ namespace RockstarLangTranspiler
 
         #endregion
 
-        #region Addition
+        #region Mathematical operations
 
         public const string Plus = "plus";
 
-        public const string With = "with"; 
+        public const string With = "with";
+
+        public const string Minus = "minus";
+
+        public const string Without = "without";
 
         #endregion
 

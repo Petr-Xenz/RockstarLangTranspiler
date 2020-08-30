@@ -17,11 +17,11 @@ namespace RockstarLangTranspilerTests
 
             var syntaxTree = parser.Parse();
             Assert.AreEqual(1, syntaxTree.RootExpressions.Count());
-            Assert.IsTrue(syntaxTree.RootExpressions.Single() is AdditionExpression a);
+            Assert.IsTrue(syntaxTree.RootExpressions.Single() is AdditionExpression);
         }
 
         [TestMethod]
-        public void ParseMultipleAdditionExpression()
+        public void ParseMultipleAdditionExpressions()
         {
             var tokens = new Token[] { new NumberToken(0, 0, "1"), new AdditionToken(0, 0, ""), new NumberToken(0, 0, "2"), new AdditionToken(0, 0, ""), new NumberToken(0, 0, "3") };
             var parser = new Parser(tokens);

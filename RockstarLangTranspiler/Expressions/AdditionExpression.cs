@@ -1,17 +1,10 @@
-﻿using System;
-
-namespace RockstarLangTranspiler.Expressions
+﻿namespace RockstarLangTranspiler.Expressions
 {
-    public class AdditionExpression : IExpression
+    public class AdditionExpression : CompoundExpression
     {
-        public AdditionExpression(IExpression left, IExpression right)
+        public AdditionExpression(IExpression left, IExpression right) : base(left, right)
         {
-            Left = left ?? throw new ArgumentNullException(nameof(left));
-            Right = right ?? throw new ArgumentNullException(nameof(right));
+
         }
-
-        public IExpression Left { get; }
-
-        public IExpression Right { get; }
     }
 }

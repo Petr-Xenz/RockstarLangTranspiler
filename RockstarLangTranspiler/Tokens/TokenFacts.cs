@@ -10,7 +10,7 @@ namespace RockstarLangTranspiler.Expressions
         {
             return token switch
             {
-                AdditionToken _ => true,
+                CombiningToken _ => true,
                 _ => false,
             };
         }
