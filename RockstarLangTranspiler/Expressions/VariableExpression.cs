@@ -15,6 +15,5 @@ namespace RockstarLangTranspiler.Expressions
 
             VariableName = variableName;
         }
-    }
-        
+    }        
 }

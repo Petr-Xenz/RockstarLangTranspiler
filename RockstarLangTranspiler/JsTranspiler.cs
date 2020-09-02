@@ -19,6 +19,8 @@ namespace RockstarLangTranspiler
         {
             return expression switch
             {
+                NullExpression _ => "null",
+                UndefinedExpression _ => "undefined",
                 OutputExpression output => CreateConsoleInfoExpression(output),
                 ConstantExpression constant => CreateConstantExpression(constant),
                 BooleanExpression boolean => CreateBooleanExpression(boolean),

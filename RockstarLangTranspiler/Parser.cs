@@ -4,7 +4,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Xml.Schema;
 
 namespace RockstarLangTranspiler
 {
@@ -43,6 +42,8 @@ namespace RockstarLangTranspiler
 
             (IExpression expression, int nextTokenPosition) expression = token switch
             {
+                NullToken _ => (new NullExpression(), ++currentTokenPosition),
+                UndefinedToken _ => (new UndefinedExpression(), ++currentTokenPosition),
                 NumberToken number => CreateConstantExpression(number, currentTokenPosition, isBackTracking),
                 BooleanToken boolean => CreateBooleanExpression(boolean, currentTokenPosition, isBackTracking),
                 AdditionToken _ => CreateCompoundExpression((l, r) => new AdditionExpression(l, r), currentTokenPosition),
