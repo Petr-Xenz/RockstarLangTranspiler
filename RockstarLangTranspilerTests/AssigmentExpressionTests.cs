@@ -19,7 +19,7 @@ namespace RockstarLangTranspilerTests
             Assert.AreEqual(1, syntaxTree.RootExpressions.Count());
             Assert.IsTrue(syntaxTree.RootExpressions.Single() is VariableAssigmentExpression);
             var e = syntaxTree.RootExpressions.Single() as VariableAssigmentExpression;
-            Assert.AreEqual("Foo", e.VariableName);
+            Assert.AreEqual("Foo", e.Variable.VariableName);
             Assert.IsTrue(e.AssigmentExpression is ConstantExpression c && c.Value == 55f);
         }
 
@@ -33,7 +33,7 @@ namespace RockstarLangTranspilerTests
             Assert.AreEqual(1, syntaxTree.RootExpressions.Count());
             Assert.IsTrue(syntaxTree.RootExpressions.Single() is VariableAssigmentExpression);
             var e = syntaxTree.RootExpressions.Single() as VariableAssigmentExpression;
-            Assert.AreEqual("x", e.VariableName);
+            Assert.AreEqual("x", e.Variable.VariableName);
             Assert.IsTrue(e.AssigmentExpression is ConstantExpression c && c.Value == 33f);
         }
 
@@ -47,7 +47,7 @@ namespace RockstarLangTranspilerTests
             Assert.AreEqual(1, syntaxTree.RootExpressions.Count());
             Assert.IsTrue(syntaxTree.RootExpressions.Single() is VariableAssigmentExpression);
             var e = syntaxTree.RootExpressions.Single() as VariableAssigmentExpression;
-            Assert.AreEqual("x", e.VariableName);
+            Assert.AreEqual("x", e.Variable.VariableName);
             Assert.IsTrue(e.AssigmentExpression is ConstantExpression c && c.Value == 5f);
         }
     }

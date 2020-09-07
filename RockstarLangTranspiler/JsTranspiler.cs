@@ -104,7 +104,7 @@ namespace RockstarLangTranspiler
         }
 
         private string CreateAssigmentExpression(VariableAssigmentExpression assigment) 
-            => $"let {assigment.VariableName} = {TranspileExpression(assigment.AssigmentExpression)}";
+            => $"let {assigment.Variable.VariableName} = {TranspileExpression(assigment.AssigmentExpression)}";
 
         private string CreateBooleanExpression(BooleanExpression boolean)
             => boolean.Value ? "true" : "false";

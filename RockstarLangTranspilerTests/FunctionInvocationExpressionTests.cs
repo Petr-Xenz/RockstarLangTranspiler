@@ -86,7 +86,7 @@ namespace RockstarLangTranspilerTests
             Assert.IsTrue(result[0] is VariableAssigmentExpression);
             var varExp = result[0] as VariableAssigmentExpression;
 
-            Assert.AreEqual(varExp.VariableName, "var");
+            Assert.AreEqual("var", varExp.Variable.VariableName);
             Assert.IsTrue(varExp.AssigmentExpression is FunctionInvocationExpression);
             var invokeExp = varExp.AssigmentExpression as FunctionInvocationExpression;
 
@@ -117,7 +117,7 @@ namespace RockstarLangTranspilerTests
             Assert.IsTrue(result[0] is VariableAssigmentExpression);
             var varExp = result[0] as VariableAssigmentExpression;
 
-            Assert.AreEqual(varExp.VariableName, "var");
+            Assert.AreEqual("var", varExp.Variable.VariableName);
             Assert.IsTrue(varExp.AssigmentExpression is FunctionInvocationExpression);
             var invokeExp = varExp.AssigmentExpression as FunctionInvocationExpression;
 

@@ -109,6 +109,20 @@ namespace RockstarLangTranspiler
 
         #endregion
 
+        #region Proper variable prefixes
+
+        public const string A = "a";
+
+        public const string An = "an";
+
+        public const string The = "the";
+
+        public const string My = "my";
+
+        public const string Your = "your";
+
+        #endregion
+
         public static IEnumerable<string> AllReservedWords { get; } =
             typeof(KeyWords).GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)
             .Where(f => f.IsLiteral && !f.IsInitOnly)

@@ -82,7 +82,7 @@ namespace RockstarLangTranspilerTests
         {
             var tree = new SyntaxTree(new[]
             {
-                    new VariableAssigmentExpression("x", new ConstantExpression(3))
+                    new VariableAssigmentExpression(new VariableExpression("x"), new ConstantExpression(3))
             });
 
             var transpiler = new JsTranspiler();

@@ -4,13 +4,13 @@ namespace RockstarLangTranspiler.Expressions
 {
     public class VariableAssigmentExpression : IExpression
     {
-        public VariableAssigmentExpression(string variableName, IExpression assigmentExpression)
+        public VariableAssigmentExpression(VariableExpression variable, IExpression assigmentExpression)
         {
-            VariableName = variableName ?? throw new ArgumentNullException(nameof(variableName));
+            Variable = variable ?? throw new ArgumentNullException(nameof(variable));
             AssigmentExpression = assigmentExpression ?? throw new ArgumentNullException(nameof(assigmentExpression));
         }
 
-        public string VariableName { get; }
+        public VariableExpression Variable { get; }
 
         public IExpression AssigmentExpression { get; }
     }

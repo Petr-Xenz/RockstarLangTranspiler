@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using static RockstarLangTranspiler.KeyWords;
 
 namespace RockstarLangTranspiler
 {
@@ -57,6 +58,7 @@ namespace RockstarLangTranspiler
                 AndToken _ => CreateExpressionBranch(currentTokenPosition + 1),
                 CommaToken _ => CreateExpressionBranch(currentTokenPosition + 1),
                 FunctionArgumentSeparatorToken _ => CreateExpressionBranch(currentTokenPosition + 1),
+                ProperVariablePrefixToken _ => ParseProperVariable(currentTokenPosition),
                 WordToken _ => ParseWordToken(currentTokenPosition, isBackTracking),
                 EndOfTheLineToken _ => (null, currentTokenPosition + 1),
                 _ => throw new ArgumentException(),
@@ -159,22 +161,18 @@ namespace RockstarLangTranspiler
 
             return token.Value.ToLower() switch
             {
-                "let" => LetAssigmentBranch(),
-                "put" => PutAssigmentBranch(),
+                Let => LetAssigmentBranch(),
+                Put => PutAssigmentBranch(),
                 _ => throw new NotSupportedException(token.Value),
             };
 
             (VariableAssigmentExpression, int) LetAssigmentBranch()
             {
-                var expectedVariableToken = PeekNextToken(currentTokenPosition) as WordToken 
-                    ?? throw new UnexpectedTokenException();
-                var variable = expectedVariableToken.Value;
-                var expectedAuxiliaryToken = PeekNextToken(currentTokenPosition + 1) as AssigmentToken 
-                    ?? throw new UnexpectedTokenException();
+                var variable = CreateVaraibleExpression(currentTokenPosition + 1);
 
-                var (expression, nextTokenPosition) = CreateExpressionBranch(currentTokenPosition + 3);
+                var (expression, nextTokenPosition) = CreateExpressionBranch(variable.nextTokenPosition + 1);
 
-                return (new VariableAssigmentExpression(variable, expression),
+                return (new VariableAssigmentExpression(variable.expression, expression),
                     nextTokenPosition);
             }
 
@@ -182,16 +180,13 @@ namespace RockstarLangTranspiler
             {
                 var (expression, nextTokenPosition) = CreateExpressionBranch(currentTokenPosition + 1, true);
                 var expectedAuxiliaryToken = PeekNextToken(nextTokenPosition - 1) as AssigmentToken;
-                if (expectedAuxiliaryToken is null || !expectedAuxiliaryToken.Value.Equals("into", StringComparison.OrdinalIgnoreCase))
+                if (expectedAuxiliaryToken is null || !expectedAuxiliaryToken.Value.Equals(Into, StringComparison.OrdinalIgnoreCase))
                     throw new UnexpectedTokenException();
 
-                var expectedVariableToken = PeekNextToken(nextTokenPosition) as WordToken
-                    ?? throw new UnexpectedTokenException(PeekNextToken(nextTokenPosition).ToString());
+                var variable = CreateVaraibleExpression(nextTokenPosition + 1);
 
-                var variable = expectedVariableToken.Value;
-
-                return (new VariableAssigmentExpression(variable, expression),
-                    nextTokenPosition + 2);
+                return (new VariableAssigmentExpression(variable.expression, expression),
+                    variable.nextTokenPosition);
             }
         }
 
@@ -201,32 +196,69 @@ namespace RockstarLangTranspiler
             var nextToken = PeekNextToken(currentTokenPosition);
             var result = (nextToken, isBackTracking) switch
             {
-                (AssigmentToken _, _) => CreateSimpleAssigment(),
+                (AssigmentToken _, _) => CreateSimpleAssigment(CreateSimpleVariableExpression(token, currentTokenPosition).expression, currentTokenPosition + 1),
                 (FunctionDeclarationToken _, _) => CreateFunctionExpression(currentTokenPosition),
                 (FunctionInvocationToken _, _) => CreateFunctionInvocationExpression(currentTokenPosition),
                 (AdditionToken _, false) => CreateExpressionBranch(currentTokenPosition + 1, true),
 
-                (AdditionToken _, true) => CreateSimpleVariableExpression(),
-                (EndOfTheLineToken _, _) => CreateSimpleVariableExpression(),
-                (EndOfFileToken _, _) => CreateSimpleVariableExpression(),
-                (AndToken _, _) => CreateSimpleVariableExpression(),
-                (CommaToken _, _) => CreateSimpleVariableExpression(),
-                (FunctionArgumentSeparatorToken _, _) => CreateSimpleVariableExpression(),
+                (AdditionToken _, true) => CreateSimpleVariableExpression(token, currentTokenPosition),
+                (EndOfTheLineToken _, _) => CreateSimpleVariableExpression(token, currentTokenPosition),
+                (EndOfFileToken _, _) => CreateSimpleVariableExpression(token, currentTokenPosition),
+                (AndToken _, _) => CreateSimpleVariableExpression(token, currentTokenPosition),
+                (CommaToken _, _) => CreateSimpleVariableExpression(token, currentTokenPosition),
+                (FunctionArgumentSeparatorToken _, _) => CreateSimpleVariableExpression(token, currentTokenPosition),
                 _ => throw new NotSupportedException(),
             };
 
             return result;
+        }
 
-            (IExpression, int) CreateSimpleVariableExpression()
-            {
-                return (new VariableExpression(token.Value), currentTokenPosition + 1);
-            }
+        private (IExpression expression, int nextTokenPosition) CreateSimpleAssigment(VariableExpression variableExpression, int assigmentTokenPosition)
+        {
+            var (expression, nextTokenPosition) = CreateExpressionBranch(assigmentTokenPosition + 1);
+            return (new VariableAssigmentExpression(variableExpression, expression), nextTokenPosition);
+        }
 
-            (IExpression, int) CreateSimpleAssigment()
+        private static (VariableExpression expression, int nextTokenPosition) CreateSimpleVariableExpression(Token token, int currentTokenPosition) 
+            => (new VariableExpression(token.Value), currentTokenPosition + 1);
+
+        private (VariableExpression expression, int nextTokenPosition) CreateVaraibleExpression(int currentTokenPosition)
+        {
+            var currentToken = _tokens[currentTokenPosition];
+            var nextToken = PeekNextToken(currentTokenPosition);
+
+            return (currentToken, nextToken) switch
             {
-                var (expression, nextTokenPosition) = CreateExpressionBranch(currentTokenPosition + 2);
-                return (new VariableAssigmentExpression(token.Value, expression), nextTokenPosition);
-            }
+                (ProperVariablePrefixToken prefix, WordToken word) => CreateProperVariable(currentTokenPosition),
+                (WordToken currentWord, WordToken nextWord) => throw new NotImplementedException("Full name variable case"),
+                (WordToken word, _) => CreateSimpleVariableExpression(word, currentTokenPosition),
+                _ => throw new UnexpectedTokenException(currentToken.GetType().ToString()),
+            };
+        }
+
+        private (IExpression expression, int nextTokenPosition) ParseProperVariable(int currentTokenPosition)
+        {
+            var nextToken = PeekNextToken(currentTokenPosition);
+            if (!(nextToken is WordToken))
+                throw new UnexpectedTokenException(nextToken.GetType().Name);
+
+            var tokenAfterVariable = PeekNextToken(currentTokenPosition + 1);
+
+            return tokenAfterVariable switch
+            {
+                AssigmentToken { Value: Is } => CreateSimpleAssigment(CreateProperVariable(currentTokenPosition).expression, currentTokenPosition + 2),
+                _ => CreateProperVariable(currentTokenPosition),
+            };
+        }
+
+        private (VariableExpression expression, int nextTokenPosition) CreateProperVariable(int currentTokenPosition)
+        {
+            var nextToken = _tokens[currentTokenPosition + 1];
+
+            if (!(nextToken is WordToken))
+                throw new UnexpectedTokenException(nextToken.Value);
+
+            return (new VariableExpression($"{_tokens[currentTokenPosition].Value}_{nextToken.Value}"), currentTokenPosition + 2);
         }
 
         private (IExpression, int) CreateFunctionInvocationExpression(int currentTokenPosition)
