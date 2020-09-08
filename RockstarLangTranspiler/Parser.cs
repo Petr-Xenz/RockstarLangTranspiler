@@ -2,6 +2,7 @@
 using RockstarLangTranspiler.Tokens;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using static RockstarLangTranspiler.KeyWords;
@@ -11,7 +12,8 @@ namespace RockstarLangTranspiler
     public class Parser
     {
         private readonly Token[] _tokens;
-        private readonly Dictionary<(int linePosition, int lineNumber), IExpression> _tokenPositionToExpression = new Dictionary<(int, int), IExpression>(); 
+        private readonly Dictionary<(int linePosition, int lineNumber), IExpression> _tokenPositionToExpression = new Dictionary<(int, int), IExpression>();
+        private readonly Stack<IList<IExpression>> _expressionsByDepth = new Stack<IList<IExpression>>();
 
         public Parser(IEnumerable<Token> tokens)
         {
@@ -21,6 +23,7 @@ namespace RockstarLangTranspiler
         public SyntaxTree Parse()
         {
             var rootExpressions = new List<IExpression>();
+            _expressionsByDepth.Push(rootExpressions);
             _tokenPositionToExpression.Clear();
             int current = 0;
             while(current < _tokens.Length && current >= 0)
@@ -35,7 +38,7 @@ namespace RockstarLangTranspiler
             return new SyntaxTree(rootExpressions);
         }
 
-        private (IExpression expression, int nextTokenPosition) CreateExpressionBranch(int currentTokenPosition, bool isBackTracking = false)
+        private (IExpression expression, int nextTokenPosition) CreateExpressionBranch(int currentTokenPosition)
         {
             if (currentTokenPosition < 0 || currentTokenPosition > _tokens.Length || _tokens[currentTokenPosition] is EndOfFileToken)
                 return (null, -1);
@@ -45,8 +48,8 @@ namespace RockstarLangTranspiler
             {
                 NullToken _ => (new NullExpression(), ++currentTokenPosition),
                 UndefinedToken _ => (new UndefinedExpression(), ++currentTokenPosition),
-                NumberToken number => CreateConstantExpression(number, currentTokenPosition, isBackTracking),
-                BooleanToken boolean => CreateBooleanExpression(boolean, currentTokenPosition, isBackTracking),
+                NumberToken number => CreateConstantExpression(number, currentTokenPosition),
+                BooleanToken boolean => CreateBooleanExpression(boolean, currentTokenPosition),
                 AdditionToken _ => CreateCompoundExpression((l, r) => new AdditionExpression(l, r), currentTokenPosition),
                 SubtractionToken _ => CreateCompoundExpression((l, r) => new SubtractionExpression(l, r), currentTokenPosition),
                 MultiplicationToken _ => CreateCompoundExpression((l, r) => new MultiplicationExpression(l, r), currentTokenPosition),
@@ -59,7 +62,7 @@ namespace RockstarLangTranspiler
                 CommaToken _ => CreateExpressionBranch(currentTokenPosition + 1),
                 FunctionArgumentSeparatorToken _ => CreateExpressionBranch(currentTokenPosition + 1),
                 ProperVariablePrefixToken _ => ParseProperVariable(currentTokenPosition),
-                WordToken _ => ParseWordToken(currentTokenPosition, isBackTracking),
+                WordToken _ => ParseWordToken(currentTokenPosition),
                 EndOfTheLineToken _ => (null, currentTokenPosition + 1),
                 _ => throw new ArgumentException(),
             };
@@ -69,19 +72,15 @@ namespace RockstarLangTranspiler
             return expression;
         }
 
-        private (IExpression, int) CreateBooleanExpression(BooleanToken boolean, int currentTokenPosition, bool isBackTracking) 
-            => CreateLiteralExpression(() => new BooleanExpression(boolean.BooleanValue()), currentTokenPosition, isBackTracking);
+        private (IExpression, int) CreateBooleanExpression(BooleanToken boolean, int currentTokenPosition) 
+            => CreateLiteralExpression(() => new BooleanExpression(boolean.BooleanValue()), currentTokenPosition);
 
-        private (IExpression, int) CreateConstantExpression(NumberToken number, int currentTokenPosition, bool isBackTracking)
-            => CreateLiteralExpression(() => new ConstantExpression(float.Parse(number.Value, CultureInfo.InvariantCulture)), currentTokenPosition, isBackTracking);
+        private (IExpression, int) CreateConstantExpression(NumberToken number, int currentTokenPosition)
+            => CreateLiteralExpression(() => new ConstantExpression(float.Parse(number.Value, CultureInfo.InvariantCulture)), currentTokenPosition);
 
-        private (IExpression, int) CreateLiteralExpression(Func<IExpression> createExpression, int currentTokenPosition, bool isBackTracking)
+        private (IExpression, int) CreateLiteralExpression(Func<IExpression> createExpression, int currentTokenPosition)
         {
-            var nextToken = PeekNextToken(currentTokenPosition);
-            if (isBackTracking || !nextToken.IsCombiningToken())
-                return (createExpression(), currentTokenPosition + 1);
-            else
-                return CreateExpressionBranch(currentTokenPosition + 1);
+            return (createExpression(), currentTokenPosition + 1);
         }
 
         private (OutputExpression, int) CreateOutputExpression(int currentTokenPosition)
@@ -92,67 +91,89 @@ namespace RockstarLangTranspiler
 
         private (T, int) CreateCompoundExpression<T>(Func<IExpression, IExpression, T> ctor, int currentTokenPosition)
         {
-            var (left, _) = CreateExpressionBranch(currentTokenPosition - 1, true);
+            var left = PopLastExpressionFromCurrentTreeLevel();
             var (right, next) = CreateExpressionBranch(currentTokenPosition + 1);
             return (ctor(left, right), next);
         }
 
         private (WhileExpression, int) CreateWhileExpression(int currentTokenPosition)
         {
-            var (conditionExpression, nextTokenPosition) = CreateExpressionBranch(currentTokenPosition + 1);
+            var (conditionExpression, nextTokenPosition) = CreateExpressionWithBacktracking(currentTokenPosition);
+
             if (conditionExpression.IsVoidType())
                 throw new InvalidOperationException("Condition expression must have return value");
 
-            nextTokenPosition = GetNextLinePosition(nextTokenPosition);
             var nextToken = _tokens[nextTokenPosition];
 
             var inners = new List<IExpression>();
+            _expressionsByDepth.Push(inners);
             while (!(nextToken is EndOfFileToken || _tokens[nextTokenPosition + 1] is EndOfTheLineToken))
             {
                 var (inner, nextInner) = CreateExpressionBranch(nextTokenPosition);
-                if (inner != null)
+                if (inner is not null)
                     inners.Add(inner);
                 nextToken = _tokens[nextInner];
                 nextTokenPosition = nextInner;
             }
-
+            _expressionsByDepth.Pop();
             return (new WhileExpression(conditionExpression, inners), nextTokenPosition);
         }
 
         private (IfExpression, int) CreateConditionExpression(int currentTokenPosition)
         {
-            var (conditionExpression, nextTokenPosition) = CreateExpressionBranch(currentTokenPosition + 1);
+            var (conditionExpression, nextTokenPosition) = CreateExpressionWithBacktracking(currentTokenPosition);
+
             if (conditionExpression.IsVoidType())
                 throw new InvalidOperationException("Condition expression must have return value");
 
-            nextTokenPosition = GetNextLinePosition(nextTokenPosition);
             var nextToken = _tokens[nextTokenPosition];
 
             var inners = new List<IExpression>();
-            while(!(nextToken is EndOfFileToken || nextToken is ElseToken || _tokens[nextTokenPosition + 1] is EndOfTheLineToken))
+            _expressionsByDepth.Push(inners);
+            while (!(nextToken is EndOfFileToken || nextToken is ElseToken || _tokens[nextTokenPosition + 1] is EndOfTheLineToken))
             {
                 var (inner, nextInner) = CreateExpressionBranch(nextTokenPosition);
-                if (inner != null)
+                if (inner is not null)
                     inners.Add(inner);
                 nextToken = _tokens[nextInner];
                 nextTokenPosition = nextInner;
             }
+            _expressionsByDepth.Pop();
 
             var elseExpressions = new List<IExpression>();
+            _expressionsByDepth.Push(elseExpressions);
             if (nextToken is ElseToken)
             {
                 nextTokenPosition++;
-                while (!(nextToken is EndOfFileToken ||  _tokens[nextTokenPosition + 1] is EndOfTheLineToken))
+                while (!(nextToken is EndOfFileToken || _tokens[nextTokenPosition + 1] is EndOfTheLineToken))
                 {
                     var (inner, nextInner) = CreateExpressionBranch(nextTokenPosition);
-                    if (inner != null)
+                    if (inner is not null)
                         elseExpressions.Add(inner);
                     nextToken = _tokens[nextInner];
                     nextTokenPosition = nextInner;
                 }
             }
+            _expressionsByDepth.Pop();
 
             return (new IfExpression(conditionExpression, inners, elseExpressions), nextTokenPosition);
+        }
+
+        private (IExpression expression, int nextTokenPosition) CreateExpressionWithBacktracking(int currentTokenPosition)
+        {
+            var expressions = new List<IExpression>();
+            var nextTokenPosition = currentTokenPosition + 1;
+            IExpression expression = null;
+            _expressionsByDepth.Push(expressions);
+            while (_tokens[nextTokenPosition] is not EndOfTheLineToken)
+            {
+                (expression, nextTokenPosition) = CreateExpressionBranch(nextTokenPosition);
+                expressions.Add(expression);
+            }
+            _expressionsByDepth.Pop();
+            Debug.Assert(expressions.Count == 1);
+
+            return (expression, nextTokenPosition + 1);
         }
 
         private (VariableAssigmentExpression, int) CreateAssigmentExpression(int currentTokenPosition)
@@ -178,7 +199,7 @@ namespace RockstarLangTranspiler
 
             (VariableAssigmentExpression, int) PutAssigmentBranch()
             {
-                var (expression, nextTokenPosition) = CreateExpressionBranch(currentTokenPosition + 1, true);
+                var (expression, nextTokenPosition) = CreateExpressionBranch(currentTokenPosition + 1);
                 var expectedAuxiliaryToken = PeekNextToken(nextTokenPosition - 1) as AssigmentToken;
                 if (expectedAuxiliaryToken is null || !expectedAuxiliaryToken.Value.Equals(Into, StringComparison.OrdinalIgnoreCase))
                     throw new UnexpectedTokenException();
@@ -190,23 +211,22 @@ namespace RockstarLangTranspiler
             }
         }
 
-        private (IExpression expression, int nextTokenPosition) ParseWordToken(int currentTokenPosition, bool isBackTracking = false)
+        private (IExpression expression, int nextTokenPosition) ParseWordToken(int currentTokenPosition)
         {
             var token = _tokens[currentTokenPosition];
             var nextToken = PeekNextToken(currentTokenPosition);
-            var result = (nextToken, isBackTracking) switch
+            var result = nextToken switch
             {
-                (AssigmentToken _, _) => CreateSimpleAssigment(CreateSimpleVariableExpression(token, currentTokenPosition).expression, currentTokenPosition + 1),
-                (FunctionDeclarationToken _, _) => CreateFunctionExpression(currentTokenPosition),
-                (FunctionInvocationToken _, _) => CreateFunctionInvocationExpression(currentTokenPosition),
-                (AdditionToken _, false) => CreateExpressionBranch(currentTokenPosition + 1, true),
+                AssigmentToken _ => CreateSimpleAssigment(CreateSimpleVariableExpression(token, currentTokenPosition).expression, currentTokenPosition + 1),
+                FunctionDeclarationToken _ => CreateFunctionExpression(currentTokenPosition),
+                FunctionInvocationToken _ => CreateFunctionInvocationExpression(currentTokenPosition),
 
-                (AdditionToken _, true) => CreateSimpleVariableExpression(token, currentTokenPosition),
-                (EndOfTheLineToken _, _) => CreateSimpleVariableExpression(token, currentTokenPosition),
-                (EndOfFileToken _, _) => CreateSimpleVariableExpression(token, currentTokenPosition),
-                (AndToken _, _) => CreateSimpleVariableExpression(token, currentTokenPosition),
-                (CommaToken _, _) => CreateSimpleVariableExpression(token, currentTokenPosition),
-                (FunctionArgumentSeparatorToken _, _) => CreateSimpleVariableExpression(token, currentTokenPosition),
+                CombiningToken _ => CreateSimpleVariableExpression(token, currentTokenPosition),
+                EndOfTheLineToken _ => CreateSimpleVariableExpression(token, currentTokenPosition),
+                EndOfFileToken _ => CreateSimpleVariableExpression(token, currentTokenPosition),
+                AndToken _ => CreateSimpleVariableExpression(token, currentTokenPosition),
+                CommaToken _ => CreateSimpleVariableExpression(token, currentTokenPosition),
+                FunctionArgumentSeparatorToken _ => CreateSimpleVariableExpression(token, currentTokenPosition),
                 _ => throw new NotSupportedException(),
             };
 
@@ -239,7 +259,7 @@ namespace RockstarLangTranspiler
         private (IExpression expression, int nextTokenPosition) ParseProperVariable(int currentTokenPosition)
         {
             var nextToken = PeekNextToken(currentTokenPosition);
-            if (!(nextToken is WordToken))
+            if (nextToken is not WordToken)
                 throw new UnexpectedTokenException(nextToken.GetType().Name);
 
             var tokenAfterVariable = PeekNextToken(currentTokenPosition + 1);
@@ -255,7 +275,7 @@ namespace RockstarLangTranspiler
         {
             var nextToken = _tokens[currentTokenPosition + 1];
 
-            if (!(nextToken is WordToken))
+            if (nextToken is not WordToken)
                 throw new UnexpectedTokenException(nextToken.Value);
 
             return (new VariableExpression($"{_tokens[currentTokenPosition].Value}_{nextToken.Value}"), currentTokenPosition + 2);
@@ -304,13 +324,14 @@ namespace RockstarLangTranspiler
             var nextLinePosition = GetNextLinePosition(currentTokenPosition);
 
             var innerExpressions = new List<IExpression>();
-
+            _expressionsByDepth.Push(innerExpressions);
             while(!(_tokens[nextLinePosition] is EndOfFileToken))
             {
                 if (_tokens[nextLinePosition] is FunctionReturnToken)
                 {
-                    var (returnExpression, nextTokenPosition) = CreateExpressionBranch(nextLinePosition + 2);
+                    var (returnExpression, nextTokenPosition) = CreateExpressionWithBacktracking(nextLinePosition + 1);
                     innerExpressions.Add(returnExpression);
+                    _expressionsByDepth.Pop();
                     return (new FunctionExpression(innerExpressions, arguments, functionName), nextTokenPosition);
                 }
                 else
@@ -321,6 +342,7 @@ namespace RockstarLangTranspiler
                 }
             }
 
+            _expressionsByDepth.Pop();
             throw new InvalidOperationException("Function does not return");
 
             IEnumerable<FunctionArgument> SelectArgumentsFromLine(int position)
@@ -357,6 +379,15 @@ namespace RockstarLangTranspiler
             return currentTokenPosition + 1 == _tokens.Length 
                 ? new EndOfFileToken(currentTokenPosition + 1, _tokens.Last().LineNumber + 1) 
                 : _tokens[currentTokenPosition + 1];
+        }
+
+        private IExpression PopLastExpressionFromCurrentTreeLevel()
+        {
+            var currentLevel = _expressionsByDepth.Peek();
+            var lastExpression = currentLevel[currentLevel.Count - 1];
+            currentLevel.RemoveAt(currentLevel.Count - 1);
+
+            return lastExpression;
         }
     }
 }

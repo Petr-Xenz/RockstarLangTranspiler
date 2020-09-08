@@ -20,7 +20,8 @@ namespace RockstarLangTranspilerTests
                 new EndOfTheLineToken(0, 0),
                 new FunctionReturnToken(0, 0, "Gives"),
                 new FunctionReturnToken(0, 0, "back"),
-                new NumberToken(0, 0, "1337")
+                new NumberToken(0, 0, "1337"),
+                new EndOfTheLineToken(0, 0),
             };
             var parser = new Parser(tokens);
             var tree = parser.Parse();
@@ -50,7 +51,8 @@ namespace RockstarLangTranspilerTests
                 new EndOfTheLineToken(0, 0),
                 new FunctionReturnToken(0, 0, "Gives"),
                 new FunctionReturnToken(0, 0, "back"),
-                new NumberToken(0, 0, "1337")
+                new NumberToken(0, 0, "1337"),
+                new EndOfTheLineToken(0, 0),
             };
             var parser = new Parser(tokens);
             var tree = parser.Parse();
@@ -84,6 +86,7 @@ namespace RockstarLangTranspilerTests
                 new WordToken(0, 0, "lame"),
                 new AdditionToken(0, 0, "with"),
                 new WordToken(0, 0, "lame"),
+                new EndOfTheLineToken(0, 0),
             };
             var parser = new Parser(tokens);
             var tree = parser.Parse();
@@ -110,7 +113,8 @@ namespace RockstarLangTranspilerTests
                 new EndOfTheLineToken(0, 0),
                 new FunctionReturnToken(0, 0, "Gives"),
                 new FunctionReturnToken(0, 0, "back"),
-                new NumberToken(0, 0, "1337")
+                new NumberToken(0, 0, "1337"),
+                new EndOfTheLineToken(0, 0),
             };
             var parser = new Parser(tokens);
             var tree = parser.Parse();
