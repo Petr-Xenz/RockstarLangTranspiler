@@ -73,20 +73,15 @@ namespace RockstarLangTranspiler
         }
 
         private (IExpression, int) CreateBooleanExpression(BooleanToken boolean, int currentTokenPosition) 
-            => CreateLiteralExpression(() => new BooleanExpression(boolean.BooleanValue()), currentTokenPosition);
+            => (new BooleanExpression(boolean.BooleanValue()), currentTokenPosition + 1);
 
         private (IExpression, int) CreateConstantExpression(NumberToken number, int currentTokenPosition)
-            => CreateLiteralExpression(() => new ConstantExpression(float.Parse(number.Value, CultureInfo.InvariantCulture)), currentTokenPosition);
-
-        private (IExpression, int) CreateLiteralExpression(Func<IExpression> createExpression, int currentTokenPosition)
-        {
-            return (createExpression(), currentTokenPosition + 1);
-        }
+            => (new ConstantExpression(float.Parse(number.Value, CultureInfo.InvariantCulture)), currentTokenPosition + 1);
 
         private (OutputExpression, int) CreateOutputExpression(int currentTokenPosition)
         {
-            var nextExpression = CreateExpressionBranch(currentTokenPosition + 1);
-            return (new OutputExpression(nextExpression.expression), nextExpression.nextTokenPosition);
+            var (expression, nextTokenPosition) = CreateExpressionBranch(currentTokenPosition + 1);
+            return (new OutputExpression(expression), nextTokenPosition);
         }
 
         private (T, int) CreateCompoundExpression<T>(Func<IExpression, IExpression, T> ctor, int currentTokenPosition)
@@ -325,7 +320,7 @@ namespace RockstarLangTranspiler
 
             var innerExpressions = new List<IExpression>();
             _expressionsByDepth.Push(innerExpressions);
-            while(!(_tokens[nextLinePosition] is EndOfFileToken))
+            while(_tokens[nextLinePosition] is not EndOfFileToken)
             {
                 if (_tokens[nextLinePosition] is FunctionReturnToken)
                 {
