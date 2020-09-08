@@ -286,6 +286,7 @@ namespace RockstarLangTranspiler
             (IEnumerable<IExpression> expression, int nextTokenPosition) SelectArgumentExpressionsFromLine(int tokenPosition)
             {
                 var result = new List<IExpression>();
+                _expressionsByDepth.Push(result);
                 var nextToken = _tokens[tokenPosition];
                 while(CanParseArgumentsFarther(nextToken))
                 {
@@ -297,6 +298,7 @@ namespace RockstarLangTranspiler
                     result.Add(argumentExpression);
                 }
 
+                _expressionsByDepth.Pop();
                 return (result, tokenPosition);
 
                 static bool CanParseArgumentsFarther(Token token)
