@@ -5,7 +5,7 @@ namespace RockstarLangTranspiler.Tokens.TokenFactories
 {
     public class NullTokenFactory : KeyWordBasedTokenFactory<NullToken>
     {
-        private static readonly string[] _keyWords = { Null };
+        private static readonly string[] _keyWords = { Null, Nobody, Nothing, Nowhere, Empty, Gone };
         public override IReadOnlyCollection<string> KeyWords => _keyWords;
 
         public override bool CanParseFarther(string value) => false;

@@ -10,6 +10,16 @@ namespace RockstarLangTranspiler
 
         public const string Null = "null";
 
+        public const string Nothing = "nothing";
+
+        public const string Nowhere = "nowhere";
+
+        public const string Nobody = "nobody";
+
+        public const string Empty = "empty";
+
+        public const string Gone = "gone";
+
         public const string Undefined = "mysterious";
 
         public const string True = "true";
