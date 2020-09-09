@@ -6,7 +6,7 @@ namespace RockstarLangTranspiler.Tokens.TokenFactories
 {
     public class BooleanTokenFactory : KeyWordBasedTokenFactory<BooleanToken>
     {
-        private static readonly string[] _keyWords = new[] { Right, Ok, Yes, Wrong, No, Lies };
+        private static readonly string[] _keyWords = new[] { True, Right, Ok, Yes, False, Wrong, No, Lies };
 
         public override IReadOnlyCollection<string> KeyWords => _keyWords;
 
