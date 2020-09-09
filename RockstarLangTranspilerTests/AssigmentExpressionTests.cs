@@ -50,5 +50,28 @@ namespace RockstarLangTranspilerTests
             Assert.AreEqual("x", e.Variable.VariableName);
             Assert.IsTrue(e.AssigmentExpression is ConstantExpression c && c.Value == 5f);
         }
+
+        [TestMethod]
+        public void AssignPoeticLiteral()
+        {
+            var tokens = new Token[] 
+            { 
+                new WordToken(0, 0, "Foo"), 
+                new AssigmentToken(0, 0, "is"),
+                new WordToken(0, 0, "a"),
+                new WordToken(0, 0, "common"),
+                new WordToken(0, 0, "name"),
+                new EndOfTheLineToken(0, 0),
+            };
+            var parser = new Parser(tokens);
+
+            var syntaxTree = parser.Parse();
+
+            Assert.AreEqual(1, syntaxTree.RootExpressions.Count());
+            Assert.IsTrue(syntaxTree.RootExpressions.Single() is VariableAssigmentExpression);
+            var e = syntaxTree.RootExpressions.Single() as VariableAssigmentExpression;
+
+            Assert.IsTrue(e.AssigmentExpression is ConstantExpression c && c.Value == 164f);
+        }
     }
 }
