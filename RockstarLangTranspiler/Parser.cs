@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using static RockstarLangTranspiler.KeyWords;
 
 namespace RockstarLangTranspiler
@@ -222,6 +223,8 @@ namespace RockstarLangTranspiler
                 AndToken _ => CreateSimpleVariableExpression(token, currentTokenPosition),
                 CommaToken _ => CreateSimpleVariableExpression(token, currentTokenPosition),
                 FunctionArgumentSeparatorToken _ => CreateSimpleVariableExpression(token, currentTokenPosition),
+
+                WordToken { IsStartingWithUpper: true } _ => CreateVaraibleExpression(currentTokenPosition),
                 _ => throw new NotSupportedException(),
             };
 
@@ -244,11 +247,23 @@ namespace RockstarLangTranspiler
 
             return (currentToken, nextToken) switch
             {
-                (CommonVariablePrefixToken prefix, WordToken word) => CreateCommonVariable(currentTokenPosition),
-                (WordToken currentWord, WordToken nextWord) => throw new NotImplementedException("Full name variable case"),
+                (CommonVariablePrefixToken _, WordToken _) => CreateCommonVariable(currentTokenPosition),
+                (WordToken { IsStartingWithUpper: true } _, WordToken { IsStartingWithUpper: true } _) => CreateProperVariable(currentTokenPosition),
                 (WordToken word, _) => CreateSimpleVariableExpression(word, currentTokenPosition),
                 _ => throw new UnexpectedTokenException(currentToken.GetType().ToString()),
             };
+        }
+
+        private (VariableExpression expression, int nextTokenPosition) CreateProperVariable(int currentTokenPosition)
+        {
+            var builder = new StringBuilder(_tokens[currentTokenPosition].Value);
+            while(PeekNextToken(currentTokenPosition) is WordToken wordToken && wordToken.IsStartingWithUpper)
+            {
+                builder.Append($"_{wordToken.Value}");
+                currentTokenPosition++;
+            }
+
+            return (new VariableExpression(builder.ToString()), currentTokenPosition + 1);
         }
 
         private (IExpression expression, int nextTokenPosition) ParseCommonVariable(int currentTokenPosition)
