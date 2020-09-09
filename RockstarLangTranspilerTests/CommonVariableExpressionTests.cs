@@ -7,14 +7,14 @@ using System.Linq;
 namespace RockstarLangTranspilerTests
 {
     [TestClass]
-    public class ProperVariableExpressionTests
+    public class CommonVariableExpressionTests
     {
         [TestMethod]
         public void ParsingProperVariableInSimpleAssigment()
         {
             var tokens = new Token[]
             {
-                new ProperVariablePrefixToken(0, 0, "a"),
+                new CommonVariablePrefixToken(0, 0, "a"),
                 new WordToken(0, 0, "boy"),
                 new AssigmentToken(0, 0, "is"),
                 new UndefinedToken(0, 0, "mysterious"),
@@ -39,7 +39,7 @@ namespace RockstarLangTranspilerTests
                 new AssigmentToken(0, 0, "put"),
                 new UndefinedToken(0, 0, "mysterious"),
                 new AssigmentToken(0, 0, "into"),
-                new ProperVariablePrefixToken(0, 0, "a"),
+                new CommonVariablePrefixToken(0, 0, "a"),
                 new WordToken(0, 0, "boy"),
                 new EndOfTheLineToken(0, 0),
             };
@@ -59,10 +59,10 @@ namespace RockstarLangTranspilerTests
         {
             var tokens = new Token[]
             {
-                new ProperVariablePrefixToken(0, 0, "a"),
+                new CommonVariablePrefixToken(0, 0, "a"),
                 new WordToken(0, 0, "boy"),
                 new AdditionToken(0, 0, "plus"),
-                new ProperVariablePrefixToken(0, 0, "the"),
+                new CommonVariablePrefixToken(0, 0, "the"),
                 new WordToken(0, 0, "gun"),
                 new EndOfTheLineToken(0, 0),
             };

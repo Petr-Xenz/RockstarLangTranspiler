@@ -61,7 +61,7 @@ namespace RockstarLangTranspiler
                 AndToken _ => CreateExpressionBranch(currentTokenPosition + 1),
                 CommaToken _ => CreateExpressionBranch(currentTokenPosition + 1),
                 FunctionArgumentSeparatorToken _ => CreateExpressionBranch(currentTokenPosition + 1),
-                ProperVariablePrefixToken _ => ParseProperVariable(currentTokenPosition),
+                CommonVariablePrefixToken _ => ParseCommonVariable(currentTokenPosition),
                 WordToken _ => ParseWordToken(currentTokenPosition),
                 EndOfTheLineToken _ => (null, currentTokenPosition + 1),
                 _ => throw new ArgumentException(),
@@ -244,14 +244,14 @@ namespace RockstarLangTranspiler
 
             return (currentToken, nextToken) switch
             {
-                (ProperVariablePrefixToken prefix, WordToken word) => CreateProperVariable(currentTokenPosition),
+                (CommonVariablePrefixToken prefix, WordToken word) => CreateCommonVariable(currentTokenPosition),
                 (WordToken currentWord, WordToken nextWord) => throw new NotImplementedException("Full name variable case"),
                 (WordToken word, _) => CreateSimpleVariableExpression(word, currentTokenPosition),
                 _ => throw new UnexpectedTokenException(currentToken.GetType().ToString()),
             };
         }
 
-        private (IExpression expression, int nextTokenPosition) ParseProperVariable(int currentTokenPosition)
+        private (IExpression expression, int nextTokenPosition) ParseCommonVariable(int currentTokenPosition)
         {
             var nextToken = PeekNextToken(currentTokenPosition);
             if (nextToken is not WordToken)
@@ -261,12 +261,12 @@ namespace RockstarLangTranspiler
 
             return tokenAfterVariable switch
             {
-                AssigmentToken { Value: Is } => CreateSimpleAssigment(CreateProperVariable(currentTokenPosition).expression, currentTokenPosition + 2),
-                _ => CreateProperVariable(currentTokenPosition),
+                AssigmentToken { Value: Is } => CreateSimpleAssigment(CreateCommonVariable(currentTokenPosition).expression, currentTokenPosition + 2),
+                _ => CreateCommonVariable(currentTokenPosition),
             };
         }
 
-        private (VariableExpression expression, int nextTokenPosition) CreateProperVariable(int currentTokenPosition)
+        private (VariableExpression expression, int nextTokenPosition) CreateCommonVariable(int currentTokenPosition)
         {
             var nextToken = _tokens[currentTokenPosition + 1];
 
