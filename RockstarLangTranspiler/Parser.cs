@@ -63,6 +63,7 @@ namespace RockstarLangTranspiler
                 CommaToken _ => CreateExpressionBranch(currentTokenPosition + 1),
                 FunctionArgumentSeparatorToken _ => CreateExpressionBranch(currentTokenPosition + 1),
                 CommonVariablePrefixToken _ => ParseCommonVariable(currentTokenPosition),
+                CommentToken { IsCommentStart: true} _ => SkipComment(currentTokenPosition + 1),
                 WordToken _ => ParseWordToken(currentTokenPosition),
                 EndOfTheLineToken _ => (null, currentTokenPosition + 1),
                 _ => throw new ArgumentException(),
@@ -71,6 +72,19 @@ namespace RockstarLangTranspiler
             _tokenPositionToExpression[(token.LinePosition, token.LineNumber)] = expression.expression;
 
             return expression;
+        }
+
+        private (IExpression, int) SkipComment(int currentTokenPosition)
+        {
+            while(_tokens[currentTokenPosition] is not EndOfTheLineToken)
+            {
+                if (_tokens[currentTokenPosition] is CommentToken t && !t.IsCommentStart)
+                    return CreateExpressionBranch(currentTokenPosition + 1);
+
+                currentTokenPosition++;
+            }
+
+            throw new UnexpectedTokenException("Comment is not closed");
         }
 
         private (IExpression, int) CreateBooleanExpression(BooleanToken boolean, int currentTokenPosition)
