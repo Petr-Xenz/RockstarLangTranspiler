@@ -58,7 +58,51 @@ namespace RockstarLangTranspiler
 
         #endregion
 
+        #region Comparsion
+
         public const string And = "and";
+
+        public const string Isnt = "isn't";
+
+        public const string Aint = "ain't";
+
+        public const string Higher = "higher";
+
+        public const string Greater = "greater";
+
+        public const string Bigger = "bigger";
+
+        public const string Stonger = "stronger";
+
+        public const string Lower = "lower";
+
+        public const string Smaller = "smaller";
+
+        public const string Weaker = "weaker";
+
+        public const string As = "as";
+
+        public const string Than = "than";
+
+        public const string High = "high";
+
+        public const string Great = "great";
+
+        public const string Big = "big";
+
+        public const string Strong = "strong";
+
+        public const string Low = "low";
+
+        public const string Little = "little";
+
+        public const string Small = "small";
+
+        public const string Weak = "weak";
+
+        #endregion
+
+        public const string Is = "is";
 
         #region Assigment
 
@@ -66,7 +110,6 @@ namespace RockstarLangTranspiler
 
         public const string Be = "be";
 
-        public const string Is = "is";
 
         public const string Are = "are";
 

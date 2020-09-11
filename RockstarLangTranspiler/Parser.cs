@@ -251,7 +251,7 @@ namespace RockstarLangTranspiler
             var nextToken = PeekNextToken(currentTokenPosition);
             var result = nextToken switch
             {
-                AssigmentToken _ => CreateSimpleAssigment(CreateSimpleVariableExpression(token, currentTokenPosition).expression, currentTokenPosition + 1),
+                IsToken _ => CreateSimpleAssigment(CreateSimpleVariableExpression(token, currentTokenPosition).expression, currentTokenPosition + 1),
                 FunctionDeclarationToken _ => CreateFunctionExpression(currentTokenPosition),
                 FunctionInvocationToken _ => CreateFunctionInvocationExpression(currentTokenPosition),
 
@@ -272,7 +272,7 @@ namespace RockstarLangTranspiler
 
         private (IExpression constantExpression, int nextTokenPosition) CreatePoeticLiteralExpression(int currentTokenPosition)
         {
-            if (_tokens[currentTokenPosition - 1] is not AssigmentToken)
+            if (_tokens[currentTokenPosition - 1] is not IsToken)
                 throw new UnexpectedTokenException("Poetic constant literal parsed in unexpcted position");
 
             var lastPoeticLiteralPosition = GetNextLinePosition(currentTokenPosition) - 2;

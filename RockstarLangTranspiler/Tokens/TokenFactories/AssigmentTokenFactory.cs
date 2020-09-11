@@ -5,7 +5,7 @@ namespace RockstarLangTranspiler.Tokens.TokenFactories
 {
     public class AssigmentTokenFactory : KeyWordBasedTokenFactory<AssigmentToken>
     {
-        private static readonly string[] _keyWords = new[] { Let, Be, Is, Are, Was, Were, Put, Into };
+        private static readonly string[] _keyWords = new[] { Let, Be, Are, Was, Were, Put, Into };
 
         public override IReadOnlyCollection<string> KeyWords => _keyWords;
 
@@ -15,6 +15,5 @@ namespace RockstarLangTranspiler.Tokens.TokenFactories
         {
             return new AssigmentToken(linePosition, lineNumber, value);
         }
-
     }
 }

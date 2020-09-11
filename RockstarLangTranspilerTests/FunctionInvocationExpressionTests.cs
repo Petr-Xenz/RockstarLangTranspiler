@@ -72,7 +72,7 @@ namespace RockstarLangTranspilerTests
             var tokens = new Token[]
             {
                 new WordToken(0, 0, "var"),
-                new AssigmentToken(0, 0, "is"),
+                new IsToken(0, 0, "is"),
                 new WordToken(0, 0, "func"),
                 new FunctionInvocationToken(0, 0, "taking"),
                 new NumberToken(0, 0, "3"),

@@ -12,7 +12,7 @@ namespace RockstarLangTranspilerTests
         [TestMethod]
         public void ParseSimpleConstantAssigment()
         {
-            var tokens = new Token[] { new WordToken(0, 0, "Foo"), new AssigmentToken(0, 0, ""), new NumberToken(0, 0, "55") };
+            var tokens = new Token[] { new WordToken(0, 0, "Foo"), new IsToken(0, 0, ""), new NumberToken(0, 0, "55") };
             var parser = new Parser(tokens);
 
             var syntaxTree = parser.Parse();
@@ -57,7 +57,7 @@ namespace RockstarLangTranspilerTests
             var tokens = new Token[] 
             { 
                 new WordToken(0, 0, "Foo"), 
-                new AssigmentToken(0, 0, "is"),
+                new IsToken(0, 0, "is"),
                 new WordToken(0, 0, "a"),
                 new WordToken(0, 0, "common"),
                 new WordToken(0, 0, "name"),

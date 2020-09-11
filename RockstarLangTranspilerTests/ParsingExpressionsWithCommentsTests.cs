@@ -20,7 +20,7 @@ namespace RockstarLangTranspilerTests
                 new NumberToken(0, 0, "55"),
                 new CommentToken(0 ,0, ")"),
                 new WordToken(0, 0, "Foo"),
-                new AssigmentToken(0, 0, ""),
+                new IsToken(0, 0, ""),
                 new NumberToken(0, 0, "55"),
                 new EndOfTheLineToken(0, 0),
             };
@@ -40,7 +40,7 @@ namespace RockstarLangTranspilerTests
             var tokens = new Token[]
             {
                 new WordToken(0, 0, "Foo"),
-                new AssigmentToken(0, 0, ""),
+                new IsToken(0, 0, ""),
                 new NumberToken(0, 0, "55"),
                 new CommentToken(0, 0, "("),
                 new WordToken(0, 0, "Foo"),
@@ -71,7 +71,7 @@ namespace RockstarLangTranspilerTests
                 new NumberToken(0, 0, "55"),
                 new CommentToken(0 ,0, ")"),
                 new WordToken(0, 0, "Foo"),
-                new AssigmentToken(0, 0, ""),
+                new IsToken(0, 0, ""),
                 new NumberToken(0, 0, "55"),
                 new EndOfTheLineToken(0, 0),
             };
@@ -91,7 +91,7 @@ namespace RockstarLangTranspilerTests
             var tokens = new Token[]
             {
                 new WordToken(0, 0, "Foo"),
-                new AssigmentToken(0, 0, "is"),
+                new IsToken(0, 0, "is"),
                 new CommentToken(0, 0, "("),
                 new WordToken(0, 0, "variable"),
                 new WordToken(0, 0, "assigment"),

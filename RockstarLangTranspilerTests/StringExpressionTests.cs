@@ -37,7 +37,7 @@ namespace RockstarLangTranspilerTests
             var tokens = new Token[]
             {
                 new WordToken(0, 0, "boy"),
-                new AssigmentToken(0, 0, "is"),
+                new IsToken(0, 0, "is"),
                 new QuoteToken(0, 0),
                 new UndefinedToken(0, 0, "mysterious"),
                 new QuoteToken(0, 0),
