@@ -58,9 +58,9 @@ namespace RockstarLangTranspiler
 
         #endregion
 
-        #region Comparsion
-
         public const string And = "and";
+
+        #region Comparsion
 
         public const string Isnt = "isn't";
 
@@ -72,9 +72,11 @@ namespace RockstarLangTranspiler
 
         public const string Bigger = "bigger";
 
-        public const string Stonger = "stronger";
+        public const string Stronger = "stronger";
 
         public const string Lower = "lower";
+
+        public const string Less = "less";
 
         public const string Smaller = "smaller";
 

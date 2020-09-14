@@ -16,6 +16,8 @@ namespace RockstarLangTranspiler
         private readonly Dictionary<(int linePosition, int lineNumber), IExpression> _tokenPositionToExpression = new Dictionary<(int, int), IExpression>();
         private readonly Stack<IList<IExpression>> _expressionsByDepth = new Stack<IList<IExpression>>();
 
+        private bool _isInConditionParsingContext = false;
+
         public Parser(IEnumerable<Token> tokens)
         {
             _tokens = tokens?.ToArray() ?? throw new ArgumentNullException(nameof(tokens));
@@ -59,6 +61,7 @@ namespace RockstarLangTranspiler
                 AssigmentToken _ => CreateAssigmentExpression(currentTokenPosition),
                 IfToken _ => CreateConditionExpression(currentTokenPosition),
                 WhileToken _ => CreateWhileExpression(currentTokenPosition),
+                IsToken _ => CreateComparsionExpression(currentTokenPosition),
                 AndToken _ => CreateExpressionBranch(currentTokenPosition + 1),
                 CommaToken _ => CreateExpressionBranch(currentTokenPosition + 1),
                 FunctionArgumentSeparatorToken _ => CreateExpressionBranch(currentTokenPosition + 1),
@@ -132,7 +135,7 @@ namespace RockstarLangTranspiler
 
         private (WhileExpression, int) CreateWhileExpression(int currentTokenPosition)
         {
-            var (conditionExpression, nextTokenPosition) = CreateExpressionWithBacktracking(currentTokenPosition);
+            var (conditionExpression, nextTokenPosition) = CreateExpressionWithConditionState(currentTokenPosition, _isInConditionParsingContext);
 
             if (conditionExpression.IsVoidType())
                 throw new InvalidOperationException("Condition expression must have return value");
@@ -155,7 +158,7 @@ namespace RockstarLangTranspiler
 
         private (IfExpression, int) CreateConditionExpression(int currentTokenPosition)
         {
-            var (conditionExpression, nextTokenPosition) = CreateExpressionWithBacktracking(currentTokenPosition);
+            var (conditionExpression, nextTokenPosition) = CreateExpressionWithConditionState(currentTokenPosition, _isInConditionParsingContext);
 
             if (conditionExpression.IsVoidType())
                 throw new InvalidOperationException("Condition expression must have return value");
@@ -210,6 +213,19 @@ namespace RockstarLangTranspiler
             return (expression, nextTokenPosition + 1);
         }
 
+        private (IExpression expression, int nextTokenPosition) CreateExpressionWithConditionState(int currentTokenPosition, bool currentContextState)
+        {
+            try
+            {
+                _isInConditionParsingContext = true;
+                return CreateExpressionWithBacktracking(currentTokenPosition);
+            }
+            finally
+            {
+                _isInConditionParsingContext = currentContextState;
+            }
+        }
+
         private (VariableAssigmentExpression, int) CreateAssigmentExpression(int currentTokenPosition)
         {
             var token = _tokens[currentTokenPosition] as AssigmentToken;
@@ -251,7 +267,7 @@ namespace RockstarLangTranspiler
             var nextToken = PeekNextToken(currentTokenPosition);
             var result = nextToken switch
             {
-                IsToken _ => CreateSimpleAssigment(CreateSimpleVariableExpression(token, currentTokenPosition).expression, currentTokenPosition + 1),
+                IsToken _ => ParseExpressionBasedOnConditionalState(currentTokenPosition),
                 FunctionDeclarationToken _ => CreateFunctionExpression(currentTokenPosition),
                 FunctionInvocationToken _ => CreateFunctionInvocationExpression(currentTokenPosition),
 
@@ -268,9 +284,45 @@ namespace RockstarLangTranspiler
             };
 
             return result;
+
+            (IExpression expression, int nextTokenPosition) ParseExpressionBasedOnConditionalState(int currentTokenPosition)
+            {
+                return _isInConditionParsingContext
+                    ? CreateComparsionExpression(currentTokenPosition)
+                    : CreateSimpleAssigment(CreateSimpleVariableExpression(token, currentTokenPosition).expression, currentTokenPosition + 1);
+            }
         }
 
-        private (IExpression constantExpression, int nextTokenPosition) CreatePoeticLiteralExpression(int currentTokenPosition)
+        private (IExpression expression, int nextTokenPosition) CreateComparsionExpression(int currentTokenPosition)
+        {
+            var left = PopLastExpressionFromCurrentTreeLevel();
+            var (right, nextTokenPosition) = GetNextExpression(currentTokenPosition + 1);
+
+            var nextToken = PeekNextToken(currentTokenPosition);
+            var secondToken = PeekNextToken(currentTokenPosition + 1);
+            var thirdToken = PeekNextToken(currentTokenPosition + 2);
+
+            return (nextToken, secondToken, thirdToken) switch
+            {
+                (ComparsionToken { Value: As } _, ComparsionToken { IsHigherOrEquals: true } _, ComparsionToken { Value: As } _) => (new GreaterThanExpression(left, right, true), nextTokenPosition),
+                (ComparsionToken { Value: As } _, ComparsionToken { IsLowerOrEquals: true } _, ComparsionToken { Value: As } _) => (new LessThanExpression(left, right, true), nextTokenPosition),
+                (ComparsionToken { IsHigher: true } _, ComparsionToken { Value: Than } _, _) => (new GreaterThanExpression(left, right, false), nextTokenPosition),
+                (ComparsionToken { IsLower: true } _, ComparsionToken { Value: Than } _, _) => (new LessThanExpression(left, right, false), nextTokenPosition),
+                _ => (new EqualityExpression(left, right), nextTokenPosition),
+            };
+
+            (IExpression expression, int nextTokenPosition) GetNextExpression(int currentTokenPosition)
+            {
+                while (PeekNextToken(currentTokenPosition) is ComparsionToken)
+                {
+                    currentTokenPosition++;
+                }
+
+                return CreateExpressionBranch(currentTokenPosition);
+            }
+        }
+
+        private (IExpression expression, int nextTokenPosition) CreatePoeticLiteralExpression(int currentTokenPosition)
         {
             if (_tokens[currentTokenPosition - 1] is not IsToken)
                 throw new UnexpectedTokenException("Poetic constant literal parsed in unexpcted position");
@@ -443,7 +495,7 @@ namespace RockstarLangTranspiler
 
         private Token PeekNextToken(int currentTokenPosition)
         {
-            return currentTokenPosition + 1 == _tokens.Length
+            return currentTokenPosition + 1 >= _tokens.Length
                 ? new EndOfFileToken(currentTokenPosition + 1, _tokens.Last().LineNumber + 1)
                 : _tokens[currentTokenPosition + 1];
         }
