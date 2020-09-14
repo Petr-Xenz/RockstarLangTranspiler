@@ -60,6 +60,8 @@ namespace RockstarLangTranspiler
 
         public const string And = "and";
 
+        public const string Not = "not";
+
         #region Comparsion
 
         public const string Isnt = "isn't";

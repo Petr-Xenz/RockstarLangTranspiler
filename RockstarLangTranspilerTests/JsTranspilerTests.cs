@@ -235,7 +235,131 @@ namespace RockstarLangTranspilerTests
 
             Assert.AreEqual(expected.RemoveNonPrintableChras(), result.RemoveNonPrintableChras());
         }
-    }
+
+        [TestMethod]
+        public void TranspileEqualityExpression()
+        {
+            var tree = new SyntaxTree(new[]
+{
+                new WhileExpression(new EqualityExpression(new ConstantExpression(42), new ConstantExpression(314f)), new IExpression[]
+                {
+                    new OutputExpression(new ConstantExpression(1)),
+                    new OutputExpression(new ConstantExpression(1)),
+                })
+            });
+
+            var result = new JsTranspiler().Transpile(tree);
+            var expected = "while (42 == 314) { console.info(1) console.info(1) }";
+
+            Assert.AreEqual(expected.RemoveNonPrintableChras(), result.RemoveNonPrintableChras());
+        }
+
+        [TestMethod]
+        public void TranspileNonEqualExpression()
+        {
+            var tree = new SyntaxTree(new[]
+{
+                new WhileExpression(new NotEqualExpression(new ConstantExpression(42), new ConstantExpression(314f)), new IExpression[]
+                {
+                    new OutputExpression(new ConstantExpression(1)),
+                    new OutputExpression(new ConstantExpression(1)),
+                })
+            });
+
+            var result = new JsTranspiler().Transpile(tree);
+            var expected = "while (42 != 314) { console.info(1) console.info(1) }";
+
+            Assert.AreEqual(expected.RemoveNonPrintableChras(), result.RemoveNonPrintableChras());
+        }
+
+        [TestMethod]
+        public void TranspileGreaterThanExpression()
+        {
+            var tree = new SyntaxTree(new[]
+{
+                new WhileExpression(new GreaterThanExpression(
+                    new ConstantExpression(42),
+                    new ConstantExpression(314f),
+                    false),
+                new IExpression[]
+                {
+                    new OutputExpression(new ConstantExpression(1)),
+                    new OutputExpression(new ConstantExpression(1)),
+                })
+            });
+
+            var result = new JsTranspiler().Transpile(tree);
+            var expected = "while (42 > 314) { console.info(1) console.info(1) }";
+
+            Assert.AreEqual(expected.RemoveNonPrintableChras(), result.RemoveNonPrintableChras());
+        }
+
+        [TestMethod]
+        public void TranspileLessThanExpression()
+        {
+            var tree = new SyntaxTree(new[]
+{
+                new WhileExpression(new LessThanExpression(
+                    new ConstantExpression(42),
+                    new ConstantExpression(314f),
+                    false),
+                new IExpression[]
+                {
+                    new OutputExpression(new ConstantExpression(1)),
+                    new OutputExpression(new ConstantExpression(1)),
+                })
+            });
+
+            var result = new JsTranspiler().Transpile(tree);
+            var expected = "while (42 < 314) { console.info(1) console.info(1) }";
+
+            Assert.AreEqual(expected.RemoveNonPrintableChras(), result.RemoveNonPrintableChras());
+        }
+
+        [TestMethod]
+        public void TranspileGreaterOrEqualsThanExpression()
+        {
+            var tree = new SyntaxTree(new[]
+{
+                new WhileExpression(new GreaterThanExpression(
+                    new ConstantExpression(42),
+                    new ConstantExpression(314f),
+                    true),
+                new IExpression[]
+                {
+                    new OutputExpression(new ConstantExpression(1)),
+                    new OutputExpression(new ConstantExpression(1)),
+                })
+            });
+
+            var result = new JsTranspiler().Transpile(tree);
+            var expected = "while (42 >= 314) { console.info(1) console.info(1) }";
+
+            Assert.AreEqual(expected.RemoveNonPrintableChras(), result.RemoveNonPrintableChras());
+        }
+
+        [TestMethod]
+        public void TranspileLessOrEqualsThanExpression()
+        {
+            var tree = new SyntaxTree(new[]
+{
+                new WhileExpression(new LessThanExpression(
+                    new ConstantExpression(42),
+                    new ConstantExpression(314f),
+                    true),
+                new IExpression[]
+                {
+                    new OutputExpression(new ConstantExpression(1)),
+                    new OutputExpression(new ConstantExpression(1)),
+                })
+            });
+
+            var result = new JsTranspiler().Transpile(tree);
+            var expected = "while (42 <= 314) { console.info(1) console.info(1) }";
+
+            Assert.AreEqual(expected.RemoveNonPrintableChras(), result.RemoveNonPrintableChras());
+        }
+    }  
 
     public static class Extensions
     {

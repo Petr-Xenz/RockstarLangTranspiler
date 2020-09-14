@@ -18,12 +18,12 @@ namespace RockstarLangTranspiler.Tokens
             || Value.Equals(Stronger, System.StringComparison.OrdinalIgnoreCase)
             || Value.Equals(Bigger, System.StringComparison.OrdinalIgnoreCase);
 
-        public bool IsLowerOrEquals => Value.Equals(Lower, System.StringComparison.OrdinalIgnoreCase)
+        public bool IsLower => Value.Equals(Lower, System.StringComparison.OrdinalIgnoreCase)
             || Value.Equals(Less, System.StringComparison.OrdinalIgnoreCase)
             || Value.Equals(Smaller, System.StringComparison.OrdinalIgnoreCase)
             || Value.Equals(Weaker, System.StringComparison.OrdinalIgnoreCase);
 
-        public bool IsLower => Value.Equals(Low, System.StringComparison.OrdinalIgnoreCase)
+        public bool IsLowerOrEquals => Value.Equals(Low, System.StringComparison.OrdinalIgnoreCase)
             || Value.Equals(Little, System.StringComparison.OrdinalIgnoreCase)
             || Value.Equals(Small, System.StringComparison.OrdinalIgnoreCase)
             || Value.Equals(Weak, System.StringComparison.OrdinalIgnoreCase);

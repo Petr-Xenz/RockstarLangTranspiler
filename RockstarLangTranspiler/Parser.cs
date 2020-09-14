@@ -62,6 +62,7 @@ namespace RockstarLangTranspiler
                 IfToken _ => CreateConditionExpression(currentTokenPosition),
                 WhileToken _ => CreateWhileExpression(currentTokenPosition),
                 IsToken _ => CreateComparsionExpression(currentTokenPosition),
+                NotEqualsToken _ => CreateCompoundExpression((l, r) => new NotEqualExpression(l, r), currentTokenPosition),
                 AndToken _ => CreateExpressionBranch(currentTokenPosition + 1),
                 CommaToken _ => CreateExpressionBranch(currentTokenPosition + 1),
                 FunctionArgumentSeparatorToken _ => CreateExpressionBranch(currentTokenPosition + 1),
@@ -239,12 +240,20 @@ namespace RockstarLangTranspiler
 
             (VariableAssigmentExpression, int) LetAssigmentBranch()
             {
-                var variable = CreateVaraibleExpression(currentTokenPosition + 1);
+                try
+                {
+                    _isInConditionParsingContext = true;
+                    var variable = CreateVaraibleExpression(currentTokenPosition + 1);
 
-                var (expression, nextTokenPosition) = CreateExpressionBranch(variable.nextTokenPosition + 1);
+                    var (expression, nextTokenPosition) = CreateExpressionWithBacktracking(variable.nextTokenPosition);
 
-                return (new VariableAssigmentExpression(variable.expression, expression),
-                    nextTokenPosition);
+                    return (new VariableAssigmentExpression(variable.expression, expression),
+                        nextTokenPosition);
+                }
+                finally
+                {
+                    _isInConditionParsingContext = false;
+                }
             }
 
             (VariableAssigmentExpression, int) PutAssigmentBranch()
@@ -303,17 +312,20 @@ namespace RockstarLangTranspiler
             var thirdToken = PeekNextToken(currentTokenPosition + 2);
 
             return (nextToken, secondToken, thirdToken) switch
-            {
+            {               
                 (ComparsionToken { Value: As } _, ComparsionToken { IsHigherOrEquals: true } _, ComparsionToken { Value: As } _) => (new GreaterThanExpression(left, right, true), nextTokenPosition),
                 (ComparsionToken { Value: As } _, ComparsionToken { IsLowerOrEquals: true } _, ComparsionToken { Value: As } _) => (new LessThanExpression(left, right, true), nextTokenPosition),
                 (ComparsionToken { IsHigher: true } _, ComparsionToken { Value: Than } _, _) => (new GreaterThanExpression(left, right, false), nextTokenPosition),
                 (ComparsionToken { IsLower: true } _, ComparsionToken { Value: Than } _, _) => (new LessThanExpression(left, right, false), nextTokenPosition),
+                (NotToken _, _, _) => (new NotEqualExpression(left, right), nextTokenPosition),
                 _ => (new EqualityExpression(left, right), nextTokenPosition),
             };
 
             (IExpression expression, int nextTokenPosition) GetNextExpression(int currentTokenPosition)
             {
-                while (PeekNextToken(currentTokenPosition) is ComparsionToken)
+                while (PeekNextToken(currentTokenPosition) is ComparsionToken 
+                    || _tokens[currentTokenPosition] is NotToken
+                    || _tokens[currentTokenPosition] is ComparsionToken)
                 {
                     currentTokenPosition++;
                 }

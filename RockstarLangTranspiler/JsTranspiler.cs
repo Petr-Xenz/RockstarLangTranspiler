@@ -34,9 +34,26 @@ namespace RockstarLangTranspiler
                 FunctionInvocationExpression invokation => CreateFunctionInvocationExpression(invokation),
                 IfExpression ifExpression => CreateIfExpression(ifExpression),
                 WhileExpression whileExpression => CreateWhileExpression(whileExpression),
+                EqualityExpression equality => CreateEqualityExpression(equality),
+                NotEqualExpression notEqual => CreateNotEqualExpression(notEqual),
+                GreaterThanExpression greaterThan => CreateGreaterThanExpression(greaterThan),
+                LessThanExpression lessThan => CreateLessThanExpression(lessThan),
                 _ => throw new NotSupportedException(expression.GetType().FullName)
             };
         }
+
+        private string CreateLessThanExpression(LessThanExpression lessThan) 
+            => $"{TranspileExpression(lessThan.Left)} {(lessThan.IsOrEquals ? "<=" : "<")} {TranspileExpression(lessThan.Right)}";
+
+        private string CreateGreaterThanExpression(GreaterThanExpression greaterThan) 
+            => $"{TranspileExpression(greaterThan.Left)} {(greaterThan.IsOrEquals ? ">=" : ">")} {TranspileExpression(greaterThan.Right)}";
+
+        private string CreateNotEqualExpression(NotEqualExpression notEqualExpression) 
+            => $"{TranspileExpression(notEqualExpression.Left)} != {TranspileExpression(notEqualExpression.Right)}";
+
+        private string CreateEqualityExpression(EqualityExpression equalityExpression) 
+            => $"{TranspileExpression(equalityExpression.Left)} == {TranspileExpression(equalityExpression.Right)}";
+
 
         private string CreateWhileExpression(WhileExpression whileExpression)
         {

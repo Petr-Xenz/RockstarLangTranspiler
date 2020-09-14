@@ -26,7 +26,15 @@ namespace RockstarLangTranspilerTests
         [TestMethod]
         public void ParseLetIsAssigmentExpression()
         {
-            var tokens = new Token[] { new AssigmentToken(0, 0, "Let"), new WordToken(0, 0, "x"), new AssigmentToken(0, 0, "is"), new NumberToken(0, 0, "33") };
+            var tokens = new Token[] 
+            { 
+                new AssigmentToken(0, 0, "Let"), 
+                new WordToken(0, 0, "x"), 
+                new IsToken(0, 0, "is"), 
+                new NumberToken(0, 0, "33"),
+                new EndOfTheLineToken(0, 0),
+
+            };
             var parser = new Parser(tokens);
 
             var syntaxTree = parser.Parse();
