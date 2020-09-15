@@ -57,6 +57,8 @@ namespace RockstarLangTranspiler
                 SubtractionToken _ => CreateCompoundExpression((l, r) => new SubtractionExpression(l, r), currentTokenPosition),
                 MultiplicationToken _ => CreateCompoundExpression((l, r) => new MultiplicationExpression(l, r), currentTokenPosition),
                 DivisionToken _ => CreateCompoundExpression((l, r) => new DivisionExpression(l, r), currentTokenPosition),
+                IncrementToken { IsAuxiliary: false } _ => CreateIncrementExpression(currentTokenPosition),
+                DecrementToken { IsAuxiliary: false } _ => CreateDecrementExpression(currentTokenPosition),
                 OutputToken _ => CreateOutputExpression(currentTokenPosition),
                 AssigmentToken _ => CreateAssigmentExpression(currentTokenPosition),
                 IfToken _ => CreateConditionExpression(currentTokenPosition),
@@ -77,6 +79,34 @@ namespace RockstarLangTranspiler
             _tokenPositionToExpression[(token.LinePosition, token.LineNumber)] = expression.expression;
 
             return expression;
+        }
+
+        private (DecrementExpression expression, int nextTokenPosition) CreateDecrementExpression(int currentTokenPosition)
+        {
+            var (variable, nextTokenPosition) = CreateExpressionBranch(currentTokenPosition + 1); ;
+
+            if (variable is VariableExpression ve
+                && PeekNextToken(nextTokenPosition - 1) is DecrementToken ie
+                && ie.IsAuxiliary)
+            {
+                return (new DecrementExpression(ve), nextTokenPosition + 1);
+            }
+
+            throw new UnexpectedTokenException();
+        }
+
+        private (IncrementExpression expression, int nextTokenPosition) CreateIncrementExpression(int currentTokenPosition)
+        {
+            var (variable, nextTokenPosition) = CreateExpressionBranch(currentTokenPosition + 1); ;
+
+            if (variable is VariableExpression ve 
+                && PeekNextToken(nextTokenPosition - 1) is IncrementToken ie 
+                && ie.IsAuxiliary)
+            {
+                return (new IncrementExpression(ve), nextTokenPosition + 1);
+            }
+
+            throw new UnexpectedTokenException();
         }
 
         private (StringExpression expression, int nextTokenPosition) CreateStringExpression(int currentTokenPosition)
@@ -337,7 +367,7 @@ namespace RockstarLangTranspiler
         private (IExpression expression, int nextTokenPosition) CreatePoeticLiteralExpression(int currentTokenPosition)
         {
             if (_tokens[currentTokenPosition - 1] is not IsToken)
-                throw new UnexpectedTokenException("Poetic constant literal parsed in unexpcted position");
+                throw new UnexpectedTokenException("Poetic constant literal parsed in unexpected position");
 
             var lastPoeticLiteralPosition = GetNextLinePosition(currentTokenPosition) - 2;
             var poeticWords = _tokens.AsSpan(currentTokenPosition, lastPoeticLiteralPosition - currentTokenPosition + 1);

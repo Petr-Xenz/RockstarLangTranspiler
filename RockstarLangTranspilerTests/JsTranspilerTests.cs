@@ -359,6 +359,32 @@ namespace RockstarLangTranspilerTests
 
             Assert.AreEqual(expected.RemoveNonPrintableChras(), result.RemoveNonPrintableChras());
         }
+
+        [TestMethod]
+        public void TranspileIncrementExpression()
+        {
+            var tree = new SyntaxTree(new[]{
+                new IncrementExpression(new VariableExpression("foo")),
+            });
+
+            var result = new JsTranspiler().Transpile(tree);
+            var expected = "foo++";
+
+            Assert.AreEqual(expected.RemoveNonPrintableChras(), result.RemoveNonPrintableChras());
+        }
+
+        [TestMethod]
+        public void TranspileDecrementExpression()
+        {
+            var tree = new SyntaxTree(new[]{
+                new DecrementExpression(new VariableExpression("foo")),
+            });
+
+            var result = new JsTranspiler().Transpile(tree);
+            var expected = "foo--";
+
+            Assert.AreEqual(expected.RemoveNonPrintableChras(), result.RemoveNonPrintableChras());
+        }
     }  
 
     public static class Extensions

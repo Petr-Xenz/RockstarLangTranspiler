@@ -29,6 +29,8 @@ namespace RockstarLangTranspiler
                 SubtractionExpression subtraction => CreateSubtractionExpression(subtraction),
                 MultiplicationExpression multiplication => CreateMultiplicationExpression(multiplication),
                 DivisionExpression division => CreateDivisionExpression(division),
+                IncrementExpression increment => CreateIncrementExpression(increment),
+                DecrementExpression decrement => CreateDecrementExpression(decrement),
                 VariableAssigmentExpression assigment => CreateAssigmentExpression(assigment),
                 FunctionExpression function => CreateFunctionExpression(function),
                 FunctionInvocationExpression invokation => CreateFunctionInvocationExpression(invokation),
@@ -41,6 +43,10 @@ namespace RockstarLangTranspiler
                 _ => throw new NotSupportedException(expression.GetType().FullName)
             };
         }
+
+        private string CreateDecrementExpression(DecrementExpression decrement) => $"{decrement.Variable.VariableName}--";
+
+        private string CreateIncrementExpression(IncrementExpression increment) => $"{increment.Variable.VariableName}++";
 
         private string CreateLessThanExpression(LessThanExpression lessThan) 
             => $"{TranspileExpression(lessThan.Left)} {(lessThan.IsOrEquals ? "<=" : "<")} {TranspileExpression(lessThan.Right)}";

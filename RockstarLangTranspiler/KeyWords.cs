@@ -57,6 +57,18 @@ namespace RockstarLangTranspiler
         public const string Over = "over";
 
         #endregion
+        
+        #region ++ / --
+
+        public const string Build = "build";
+
+        public const string Up = "up";
+
+        public const string Knock = "knock";
+
+        public const string Down = "down";
+
+        #endregion
 
         public const string And = "and";
 
