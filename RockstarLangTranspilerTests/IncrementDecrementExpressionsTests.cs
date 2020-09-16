@@ -32,6 +32,45 @@ namespace RockstarLangTranspilerTests
         }
 
         [TestMethod]
+        public void IncrementSimpleVariable()
+        {
+            var tokens = new Token[]
+            {
+                new IncrementToken(0, 0, Build),
+                new WordToken(0, 0, "world"),
+                new IncrementToken(0, 0, Up),
+                new EndOfTheLineToken(0, 0),
+            };
+            var parser = new Parser(tokens);
+
+            var syntaxTree = parser.Parse();
+
+            Assert.AreEqual(1, syntaxTree.RootExpressions.Count());
+            Assert.IsTrue(syntaxTree.RootExpressions.Single() is IncrementExpression ie
+                && ie.Variable.VariableName == "world");
+        }
+
+        [TestMethod]
+        public void IncrementFullVariable()
+        {
+            var tokens = new Token[]
+            {
+                new IncrementToken(0, 0, Build),
+                new CommonVariablePrefixToken(0, 0, "the"),
+                new WordToken(0, 0, "world"),
+                new IncrementToken(0, 0, Up),
+                new EndOfTheLineToken(0, 0),
+            };
+            var parser = new Parser(tokens);
+
+            var syntaxTree = parser.Parse();
+
+            Assert.AreEqual(1, syntaxTree.RootExpressions.Count());
+            Assert.IsTrue(syntaxTree.RootExpressions.Single() is IncrementExpression ie
+                && ie.Variable.VariableName == "the_world");
+        }
+
+        [TestMethod]
         public void DecrementProperVariable()
         {
             var tokens = new Token[]

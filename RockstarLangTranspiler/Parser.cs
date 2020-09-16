@@ -310,16 +310,9 @@ namespace RockstarLangTranspiler
                 FunctionDeclarationToken _ => CreateFunctionExpression(currentTokenPosition),
                 FunctionInvocationToken _ => CreateFunctionInvocationExpression(currentTokenPosition),
 
-                CombiningToken _ => CreateSimpleVariableExpression(token, currentTokenPosition),
-                EndOfTheLineToken _ => CreateSimpleVariableExpression(token, currentTokenPosition),
-                EndOfFileToken _ => CreateSimpleVariableExpression(token, currentTokenPosition),
-                AndToken _ => CreateSimpleVariableExpression(token, currentTokenPosition),
-                CommaToken _ => CreateSimpleVariableExpression(token, currentTokenPosition),
-                FunctionArgumentSeparatorToken _ => CreateSimpleVariableExpression(token, currentTokenPosition),
-
                 WordToken { IsStartingWithUpper: true } _ => CreateVaraibleExpression(currentTokenPosition),
                 WordToken { IsStartingWithUpper: false } _ => CreatePoeticLiteralExpression(currentTokenPosition),
-                _ => throw new NotSupportedException(),
+                _ => CreateSimpleVariableExpression(token, currentTokenPosition),
             };
 
             return result;
