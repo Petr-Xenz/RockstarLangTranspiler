@@ -361,6 +361,42 @@ namespace RockstarLangTranspilerTests
         }
 
         [TestMethod]
+        public void TranspileContinueExpression()
+        {
+            var tree = new SyntaxTree(new[]
+{
+                new WhileExpression(new BooleanExpression(true),
+                new IExpression[]
+                {
+                    new ContinueExpression(),
+                })
+            });
+
+            var result = new JsTranspiler().Transpile(tree);
+            var expected = "while (true) { continue }";
+
+            Assert.AreEqual(expected.RemoveNonPrintableChras(), result.RemoveNonPrintableChras());
+        }
+
+        [TestMethod]
+        public void TranspileBreakExpression()
+        {
+            var tree = new SyntaxTree(new[]
+{
+                new WhileExpression(new BooleanExpression(true),
+                new IExpression[]
+                {
+                    new BreakExpression(),
+                })
+            });
+
+            var result = new JsTranspiler().Transpile(tree);
+            var expected = "while (true) { break }";
+
+            Assert.AreEqual(expected.RemoveNonPrintableChras(), result.RemoveNonPrintableChras());
+        }
+
+        [TestMethod]
         public void TranspileIncrementExpression()
         {
             var tree = new SyntaxTree(new[]{

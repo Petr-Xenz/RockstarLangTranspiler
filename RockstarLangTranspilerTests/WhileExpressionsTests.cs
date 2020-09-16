@@ -3,6 +3,7 @@ using RockstarLangTranspiler;
 using RockstarLangTranspiler.Expressions;
 using RockstarLangTranspiler.Tokens;
 using System.Linq;
+using static RockstarLangTranspiler.KeyWords;
 
 namespace RockstarLangTranspilerTests
 {
@@ -31,6 +32,104 @@ namespace RockstarLangTranspilerTests
 
             Assert.IsTrue(we.ConditionExpression is BooleanExpression be && be.Value == true);
             Assert.IsTrue(we.InnerExpressions.Single() is OutputExpression);
+        }
+
+        [TestMethod]
+        public void WhileWithSingleContinueToken()
+        {
+            var tokens = new Token[]
+            {
+                new WhileToken(0, 0, "while"),
+                new BooleanToken(0, 0, "right"),
+                new EndOfTheLineToken(0, 0),
+                    new ContinueToken(0, 0, Continue),
+                    new EndOfTheLineToken(0, 0),
+                new EndOfFileToken(0, 0),
+            };
+
+            var parser = new Parser(tokens);
+            var tree = parser.Parse();
+            Assert.AreEqual(1, tree.RootExpressions.Count());
+            Assert.IsTrue(tree.RootExpressions.Single() is WhileExpression);
+            var we = (WhileExpression)tree.RootExpressions.Single();
+
+            Assert.IsTrue(we.ConditionExpression is BooleanExpression be && be.Value == true);
+            Assert.IsTrue(we.InnerExpressions.Single() is ContinueExpression);
+        }
+
+        [TestMethod]
+        public void WhileWithContinueAliasTokens()
+        {
+            var tokens = new Token[]
+            {
+                new WhileToken(0, 0, "while"),
+                new BooleanToken(0, 0, "right"),
+                new EndOfTheLineToken(0, 0),
+                    new ContinueToken(0, 0, Take),
+                    new WordToken(0, 0, "it"),
+                    new WordToken(0, 0, "to"),
+                    new CommonVariablePrefixToken(0, 0, The),
+                    new WordToken(0, 0, "top"),
+                    new EndOfTheLineToken(0, 0),
+                new EndOfFileToken(0, 0),
+            };
+
+            var parser = new Parser(tokens);
+            var tree = parser.Parse();
+            Assert.AreEqual(1, tree.RootExpressions.Count());
+            Assert.IsTrue(tree.RootExpressions.Single() is WhileExpression);
+            var we = (WhileExpression)tree.RootExpressions.Single();
+
+            Assert.IsTrue(we.ConditionExpression is BooleanExpression be && be.Value == true);
+            Assert.IsTrue(we.InnerExpressions.Single() is ContinueExpression);
+        }
+
+        [TestMethod]
+        public void WhileWithSingleBreakToken()
+        {
+            var tokens = new Token[]
+            {
+                new WhileToken(0, 0, "while"),
+                new BooleanToken(0, 0, "right"),
+                new EndOfTheLineToken(0, 0),
+                    new ContinueToken(0, 0, Break),
+                    new EndOfTheLineToken(0, 0),
+                new EndOfFileToken(0, 0),
+            };
+
+            var parser = new Parser(tokens);
+            var tree = parser.Parse();
+            Assert.AreEqual(1, tree.RootExpressions.Count());
+            Assert.IsTrue(tree.RootExpressions.Single() is WhileExpression);
+            var we = (WhileExpression)tree.RootExpressions.Single();
+
+            Assert.IsTrue(we.ConditionExpression is BooleanExpression be && be.Value == true);
+            Assert.IsTrue(we.InnerExpressions.Single() is BreakExpression);
+        }
+
+        [TestMethod]
+        public void WhileWithBreakAliasTokens()
+        {
+            var tokens = new Token[]
+            {
+                new WhileToken(0, 0, "while"),
+                new BooleanToken(0, 0, "right"),
+                new EndOfTheLineToken(0, 0),
+                    new ContinueToken(0, 0, Break),
+                    new WordToken(0, 0, "it"),
+                    new DecrementToken(0, 0, Down),
+                    new EndOfTheLineToken(0, 0),
+                new EndOfFileToken(0, 0),
+            };
+
+            var parser = new Parser(tokens);
+            var tree = parser.Parse();
+            Assert.AreEqual(1, tree.RootExpressions.Count());
+            Assert.IsTrue(tree.RootExpressions.Single() is WhileExpression);
+            var we = (WhileExpression)tree.RootExpressions.Single();
+
+            Assert.IsTrue(we.ConditionExpression is BooleanExpression be && be.Value == true);
+            Assert.IsTrue(we.InnerExpressions.Single() is BreakExpression);
         }
 
         [TestMethod]

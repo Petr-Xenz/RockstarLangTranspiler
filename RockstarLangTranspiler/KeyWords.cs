@@ -136,6 +136,7 @@ namespace RockstarLangTranspiler
         public const string Put = "put";
 
         public const string Into = "into";
+
         #endregion
 
         #region Condition
@@ -180,7 +181,15 @@ namespace RockstarLangTranspiler
 
         public const string Until = "until";
 
+        public const string Break = "break";
+
+        public const string Continue = "continue";
+
+        public const string Take = "take";
+
         #endregion
+
+
 
         #region Proper variable prefixes
 

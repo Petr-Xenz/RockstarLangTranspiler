@@ -63,6 +63,8 @@ namespace RockstarLangTranspiler
                 AssigmentToken _ => CreateAssigmentExpression(currentTokenPosition),
                 IfToken _ => CreateConditionExpression(currentTokenPosition),
                 WhileToken _ => CreateWhileExpression(currentTokenPosition),
+                ContinueToken _ => CreateContinueExpressions(currentTokenPosition),
+                BreakToken _ => CreateBreakExpression(currentTokenPosition),
                 IsToken _ => CreateComparsionExpression(currentTokenPosition),
                 NotEqualsToken _ => CreateCompoundExpression((l, r) => new NotEqualExpression(l, r), currentTokenPosition),
                 AndToken _ => CreateExpressionBranch(currentTokenPosition + 1),
@@ -79,6 +81,16 @@ namespace RockstarLangTranspiler
             _tokenPositionToExpression[(token.LinePosition, token.LineNumber)] = expression.expression;
 
             return expression;
+        }
+
+        private (BreakExpression expression, int nextTokenPosition) CreateBreakExpression(int currentTokenPosition)
+        {
+            throw new NotImplementedException();
+        }
+
+        private (ContinueExpression expression, int nextTokenPosition) CreateContinueExpressions(int currentTokenPosition)
+        {
+            throw new NotImplementedException();
         }
 
         private (DecrementExpression expression, int nextTokenPosition) CreateDecrementExpression(int currentTokenPosition)
