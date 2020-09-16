@@ -85,12 +85,48 @@ namespace RockstarLangTranspiler
 
         private (BreakExpression expression, int nextTokenPosition) CreateBreakExpression(int currentTokenPosition)
         {
-            throw new NotImplementedException();
+            if (PeekNextToken(currentTokenPosition) is EndOfTheLineToken)                
+            {
+                return (new BreakExpression(), currentTokenPosition + 1);
+            }
+
+            var secondToken = PeekNextToken(currentTokenPosition);
+            var thirdToken = PeekNextToken(currentTokenPosition + 1);
+
+            if(secondToken.Value.Equals(It, StringComparison.OrdinalIgnoreCase)
+                && thirdToken.Value.Equals(Down, StringComparison.OrdinalIgnoreCase)
+                && PeekNextToken(currentTokenPosition + 2) is EndOfTheLineToken)
+            {
+                return (new BreakExpression(), currentTokenPosition + 3);
+            }
+
+            throw new UnexpectedTokenException();
         }
 
         private (ContinueExpression expression, int nextTokenPosition) CreateContinueExpressions(int currentTokenPosition)
         {
-            throw new NotImplementedException();
+            var continueToken = (ContinueToken)_tokens[currentTokenPosition];
+            if (continueToken.Value.Equals(Continue, StringComparison.OrdinalIgnoreCase)
+                && PeekNextToken(currentTokenPosition) is EndOfTheLineToken)
+            {
+                return (new ContinueExpression(), currentTokenPosition + 1);
+            }
+
+            var secondToken = PeekNextToken(currentTokenPosition);
+            var thirdToken = PeekNextToken(currentTokenPosition + 1);
+            var forthToken = PeekNextToken(currentTokenPosition + 2);
+            var fithToken = PeekNextToken(currentTokenPosition + 3);
+
+            if (secondToken.Value.Equals(It, StringComparison.OrdinalIgnoreCase)
+                && thirdToken.Value.Equals("to", StringComparison.OrdinalIgnoreCase)
+                && forthToken.Value.Equals(The, StringComparison.OrdinalIgnoreCase)
+                && fithToken.Value.Equals("top", StringComparison.OrdinalIgnoreCase)
+                && PeekNextToken(currentTokenPosition + 4) is EndOfTheLineToken)
+            {
+                return (new ContinueExpression(), currentTokenPosition + 5);
+            }
+
+            throw new UnexpectedTokenException();
         }
 
         private (DecrementExpression expression, int nextTokenPosition) CreateDecrementExpression(int currentTokenPosition)
@@ -187,7 +223,7 @@ namespace RockstarLangTranspiler
 
             var inners = new List<IExpression>();
             _expressionsByDepth.Push(inners);
-            while (!(nextToken is EndOfFileToken || _tokens[nextTokenPosition + 1] is EndOfTheLineToken))
+            do
             {
                 var (inner, nextInner) = CreateExpressionBranch(nextTokenPosition);
                 if (inner is not null)
@@ -195,6 +231,8 @@ namespace RockstarLangTranspiler
                 nextToken = _tokens[nextInner];
                 nextTokenPosition = nextInner;
             }
+            while (!(nextToken is EndOfFileToken || _tokens[nextTokenPosition + 1] is EndOfTheLineToken));
+
             _expressionsByDepth.Pop();
             return (new WhileExpression(conditionExpression, inners), nextTokenPosition);
         }

@@ -189,7 +189,7 @@ namespace RockstarLangTranspiler
 
         #endregion
 
-
+        public const string It = "it";
 
         #region Proper variable prefixes
 

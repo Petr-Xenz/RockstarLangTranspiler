@@ -92,7 +92,7 @@ namespace RockstarLangTranspilerTests
                 new WhileToken(0, 0, "while"),
                 new BooleanToken(0, 0, "right"),
                 new EndOfTheLineToken(0, 0),
-                    new ContinueToken(0, 0, Break),
+                    new BreakToken(0, 0, Break),
                     new EndOfTheLineToken(0, 0),
                 new EndOfFileToken(0, 0),
             };
@@ -115,7 +115,7 @@ namespace RockstarLangTranspilerTests
                 new WhileToken(0, 0, "while"),
                 new BooleanToken(0, 0, "right"),
                 new EndOfTheLineToken(0, 0),
-                    new ContinueToken(0, 0, Break),
+                    new BreakToken(0, 0, Break),
                     new WordToken(0, 0, "it"),
                     new DecrementToken(0, 0, Down),
                     new EndOfTheLineToken(0, 0),

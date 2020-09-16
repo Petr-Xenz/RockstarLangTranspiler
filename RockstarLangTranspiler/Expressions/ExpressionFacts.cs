@@ -12,6 +12,8 @@
                 case WhileExpression _:
                 case IncrementExpression _:
                 case DecrementExpression _:
+                case BreakExpression _:
+                case ContinueExpression _:
                     return true;
 
                 default: return false;

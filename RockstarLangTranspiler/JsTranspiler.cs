@@ -36,6 +36,8 @@ namespace RockstarLangTranspiler
                 FunctionInvocationExpression invokation => CreateFunctionInvocationExpression(invokation),
                 IfExpression ifExpression => CreateIfExpression(ifExpression),
                 WhileExpression whileExpression => CreateWhileExpression(whileExpression),
+                ContinueExpression _ => "continue",
+                BreakExpression _ => "break",
                 EqualityExpression equality => CreateEqualityExpression(equality),
                 NotEqualExpression notEqual => CreateNotEqualExpression(notEqual),
                 GreaterThanExpression greaterThan => CreateGreaterThanExpression(greaterThan),
