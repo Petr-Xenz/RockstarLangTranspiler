@@ -108,6 +108,46 @@ namespace RockstarLangTranspilerTests
         }
 
         [TestMethod]
+        public void WhileWithBreakToken()
+        {
+            var tokens = new Token[]
+            {
+                new WordToken(0, 0, "foo"),
+                new IsToken(0, 0, Is),
+                new NumberToken(0, 0, "5"),
+                new EndOfTheLineToken(0, 0),
+
+                new WhileToken(0, 0, "while"),
+                new WordToken(0, 0, "foo"),
+                new EndOfTheLineToken(0, 0),
+
+                    new DecrementToken(0, 0, Knock),
+                    new WordToken(0, 0, "foo"),
+                    new DecrementToken(0, 0, Down),
+                    new EndOfTheLineToken(0, 0),
+
+                    new IfToken(0, 0, If),
+                    new NumberToken(0, 0, "4"),
+                    new IsToken(0, 0, Is),
+                    new NumberToken(0, 0, "4"),
+                    new EndOfTheLineToken(0, 0),
+
+                    new BreakToken(0, 0, Break),
+                    new EndOfTheLineToken(0, 0),
+                    new EndOfTheLineToken(0, 0),
+
+                    new OutputToken(0, 0, Say),
+                    new WordToken(0, 0, "foo"),
+                    new EndOfTheLineToken(0, 0),
+                new EndOfFileToken(0, 0),
+            };
+
+            var parser = new Parser(tokens);
+            var tree = parser.Parse();
+            Assert.AreEqual(2, tree.RootExpressions.Count());
+        }
+
+        [TestMethod]
         public void WhileWithBreakAliasTokens()
         {
             var tokens = new Token[]

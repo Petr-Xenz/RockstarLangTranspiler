@@ -223,15 +223,20 @@ namespace RockstarLangTranspiler
 
             var inners = new List<IExpression>();
             _expressionsByDepth.Push(inners);
-            do
+            while (!(nextToken is EndOfFileToken))           
             {
                 var (inner, nextInner) = CreateExpressionBranch(nextTokenPosition);
                 if (inner is not null)
                     inners.Add(inner);
-                nextToken = _tokens[nextInner];
+                nextToken = PeekNextToken(nextInner);
                 nextTokenPosition = nextInner;
+
+                if (IsEndOfBlock(nextTokenPosition))
+                {
+                    nextTokenPosition++;
+                    break;
+                }
             }
-            while (!(nextToken is EndOfFileToken || _tokens[nextTokenPosition + 1] is EndOfTheLineToken));
 
             _expressionsByDepth.Pop();
             return (new WhileExpression(conditionExpression, inners), nextTokenPosition);
@@ -248,13 +253,19 @@ namespace RockstarLangTranspiler
 
             var inners = new List<IExpression>();
             _expressionsByDepth.Push(inners);
-            while (!(nextToken is EndOfFileToken || nextToken is ElseToken || _tokens[nextTokenPosition + 1] is EndOfTheLineToken))
+            while (!(nextToken is EndOfFileToken || nextToken is ElseToken))
             {
                 var (inner, nextInner) = CreateExpressionBranch(nextTokenPosition);
                 if (inner is not null)
                     inners.Add(inner);
-                nextToken = _tokens[nextInner];
+                nextToken = PeekNextToken(nextInner);
                 nextTokenPosition = nextInner;
+
+                if (IsEndOfBlock(nextTokenPosition))
+                {
+                    nextTokenPosition++;
+                    break;
+                }
             }
             _expressionsByDepth.Pop();
 
@@ -262,19 +273,33 @@ namespace RockstarLangTranspiler
             _expressionsByDepth.Push(elseExpressions);
             if (nextToken is ElseToken)
             {
-                nextTokenPosition++;
-                while (!(nextToken is EndOfFileToken || _tokens[nextTokenPosition + 1] is EndOfTheLineToken))
+                nextTokenPosition += 2;
+                while (!(nextToken is EndOfFileToken))
                 {
                     var (inner, nextInner) = CreateExpressionBranch(nextTokenPosition);
                     if (inner is not null)
                         elseExpressions.Add(inner);
-                    nextToken = _tokens[nextInner];
+                    nextToken = PeekNextToken(nextInner);
                     nextTokenPosition = nextInner;
+
+                    if (IsEndOfBlock(nextTokenPosition))
+                    {
+                        nextTokenPosition++;
+                        break;
+                    }
                 }
             }
             _expressionsByDepth.Pop();
 
             return (new IfExpression(conditionExpression, inners, elseExpressions), nextTokenPosition);
+        }
+
+        private bool IsEndOfBlock(int currentTokenPosition)
+        {
+            var currentToken = _tokens[currentTokenPosition];
+            var nextToken = PeekNextToken(currentTokenPosition);
+
+            return nextToken is EndOfTheLineToken && currentToken is EndOfTheLineToken;
         }
 
         private (IExpression expression, int nextTokenPosition) CreateExpressionWithBacktracking(int currentTokenPosition)

@@ -175,6 +175,7 @@ namespace RockstarLangTranspilerTests
                     new NumberToken(0, 0, "3"),
                     new EndOfTheLineToken(0, 0),
                 new EndOfTheLineToken(0, 0),
+                new EndOfFileToken(0, 0),
             };
 
             var parser = new Parser(tokens);
