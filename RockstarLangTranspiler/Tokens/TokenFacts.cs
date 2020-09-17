@@ -26,6 +26,17 @@ namespace RockstarLangTranspiler.Expressions
             };
         }
 
+        public static bool EndsBackTracking(this Token token)
+        {
+            return token switch
+            {
+                EndOfTheLineToken _ => true,
+                EndOfFileToken _ => true,
+                AssigmentToken _ => true,
+                _ => false,
+            };
+        }
+
         public static bool BooleanValue(this BooleanToken token)
         {
             return token.Value switch

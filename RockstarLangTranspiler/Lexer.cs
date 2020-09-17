@@ -23,6 +23,23 @@ namespace RockstarLangTranspiler
             _tokenFactories = tokenFactories ?? throw new ArgumentNullException(nameof(tokenFactories));
         }
 
+        public Lexer(string fileContents)
+        {
+            if (string.IsNullOrWhiteSpace(fileContents))
+            {
+                throw new ArgumentException("File is empty", nameof(fileContents));
+            }
+
+            _file = fileContents;
+            _tokenFactories = typeof(Lexer).Assembly
+                .GetTypes()
+                .Where(t => t.Name.EndsWith("TokenFactory"))
+                .Where(t => !t.IsAbstract)
+                .Select(t => Activator.CreateInstance(t))
+                .OfType<ITokenFactory<Token>>()
+                .ToList();
+        }
+
         private char PeekNext(int position) => _file[position + 1];
 
         public IEnumerable<Token> Lex()

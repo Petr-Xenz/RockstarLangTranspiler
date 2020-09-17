@@ -305,18 +305,20 @@ namespace RockstarLangTranspiler
         private (IExpression expression, int nextTokenPosition) CreateExpressionWithBacktracking(int currentTokenPosition)
         {
             var expressions = new List<IExpression>();
-            var nextTokenPosition = currentTokenPosition + 1;
+            var nextTokenPosition = currentTokenPosition;
             IExpression expression = null;
             _expressionsByDepth.Push(expressions);
-            while (_tokens[nextTokenPosition] is not EndOfTheLineToken)
+            do
             {
                 (expression, nextTokenPosition) = CreateExpressionBranch(nextTokenPosition);
                 expressions.Add(expression);
             }
+            while (!PeekToken(nextTokenPosition).EndsBackTracking());            
+            
             _expressionsByDepth.Pop();
             Debug.Assert(expressions.Count == 1);
 
-            return (expression, nextTokenPosition + 1);
+            return (expression, nextTokenPosition);
         }
 
         private (IExpression expression, int nextTokenPosition) CreateExpressionWithConditionState(int currentTokenPosition, bool currentContextState)
@@ -350,7 +352,7 @@ namespace RockstarLangTranspiler
                     _isInConditionParsingContext = true;
                     var variable = CreateVaraibleExpression(currentTokenPosition + 1);
 
-                    var (expression, nextTokenPosition) = CreateExpressionWithBacktracking(variable.nextTokenPosition);
+                    var (expression, nextTokenPosition) = CreateExpressionWithBacktracking(variable.nextTokenPosition+ 1);
 
                     return (new VariableAssigmentExpression(variable.expression, expression),
                         nextTokenPosition);
@@ -363,8 +365,8 @@ namespace RockstarLangTranspiler
 
             (VariableAssigmentExpression, int) PutAssigmentBranch()
             {
-                var (expression, nextTokenPosition) = CreateExpressionBranch(currentTokenPosition + 1);
-                var expectedAuxiliaryToken = PeekNextToken(nextTokenPosition - 1) as AssigmentToken;
+                var (expression, nextTokenPosition) = CreateExpressionWithBacktracking(currentTokenPosition + 1);
+                var expectedAuxiliaryToken = PeekToken(nextTokenPosition) as AssigmentToken;
                 if (expectedAuxiliaryToken is null || !expectedAuxiliaryToken.Value.Equals(Into, StringComparison.OrdinalIgnoreCase))
                     throw new UnexpectedTokenException();
 
@@ -601,6 +603,13 @@ namespace RockstarLangTranspiler
             }
 
             return currentTokenPosition;
+        }
+
+        private Token PeekToken(int currentTokenPosition)
+        {
+            return currentTokenPosition + 1 >= _tokens.Length
+                ? new EndOfFileToken(currentTokenPosition, _tokens.Last().LineNumber + 1)
+                : _tokens[currentTokenPosition];
         }
 
         private Token PeekNextToken(int currentTokenPosition)

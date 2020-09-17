@@ -24,13 +24,13 @@ namespace RockstarLangTranspilerTests
         }
 
         [TestMethod]
-        public void ParseLetIsAssigmentExpression()
+        public void ParseLetBeAssigmentExpression()
         {
             var tokens = new Token[] 
             { 
                 new AssigmentToken(0, 0, "Let"), 
                 new WordToken(0, 0, "x"), 
-                new IsToken(0, 0, "is"), 
+                new AssigmentToken(0, 0, "be"), 
                 new NumberToken(0, 0, "33"),
                 new EndOfTheLineToken(0, 0),
 
@@ -80,6 +80,27 @@ namespace RockstarLangTranspilerTests
             var e = syntaxTree.RootExpressions.Single() as VariableAssigmentExpression;
 
             Assert.IsTrue(e.AssigmentExpression is ConstantExpression c && c.Value == 164f);
+        }
+
+        [TestMethod]
+        public void PutAssignFullVariablesWithCompoundExpressionOnThem()
+        {
+            var src = "Put your heart without your soul into your heart";
+            var tokens = new Lexer(src).Lex();
+            var parser = new Parser(tokens);
+
+            var syntaxTree = parser.Parse();
+
+            Assert.AreEqual(1, syntaxTree.RootExpressions.Count());
+            Assert.IsTrue(syntaxTree.RootExpressions.Single() is VariableAssigmentExpression);
+            var exp = syntaxTree.RootExpressions.Single() as VariableAssigmentExpression;
+
+            Assert.AreEqual("your_heart", exp.Variable.VariableName);
+            Assert.IsTrue(exp.AssigmentExpression is SubtractionExpression);
+            var aExp = exp.AssigmentExpression as SubtractionExpression;
+
+            Assert.IsTrue(aExp.Left is VariableExpression vl && vl.VariableName == "your_heart");
+            Assert.IsTrue(aExp.Right is VariableExpression vr && vr.VariableName == "your_soul");
         }
     }
 }
