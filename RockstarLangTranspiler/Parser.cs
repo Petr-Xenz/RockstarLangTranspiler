@@ -214,7 +214,7 @@ namespace RockstarLangTranspiler
 
         private (WhileExpression, int) CreateWhileExpression(int currentTokenPosition)
         {
-            var (conditionExpression, nextTokenPosition) = CreateExpressionWithConditionState(currentTokenPosition, _isInConditionParsingContext);
+            var (conditionExpression, nextTokenPosition) = CreateExpressionWithConditionState(currentTokenPosition + 1, _isInConditionParsingContext);
 
             if (conditionExpression.IsVoidType())
                 throw new InvalidOperationException("Condition expression must have return value");
@@ -244,7 +244,7 @@ namespace RockstarLangTranspiler
 
         private (IfExpression, int) CreateConditionExpression(int currentTokenPosition)
         {
-            var (conditionExpression, nextTokenPosition) = CreateExpressionWithConditionState(currentTokenPosition, _isInConditionParsingContext);
+            var (conditionExpression, nextTokenPosition) = CreateExpressionWithConditionState(currentTokenPosition + 1, _isInConditionParsingContext);
 
             if (conditionExpression.IsVoidType())
                 throw new InvalidOperationException("Condition expression must have return value");
@@ -558,9 +558,10 @@ namespace RockstarLangTranspiler
             _expressionsByDepth.Push(innerExpressions);
             while (_tokens[nextLinePosition] is not EndOfFileToken)
             {
-                if (_tokens[nextLinePosition] is FunctionReturnToken)
+                if (PeekToken(nextLinePosition) is FunctionReturnToken
+                    && PeekNextToken(nextLinePosition) is FunctionReturnToken)
                 {
-                    var (returnExpression, nextTokenPosition) = CreateExpressionWithBacktracking(nextLinePosition + 1);
+                    var (returnExpression, nextTokenPosition) = CreateExpressionWithBacktracking(nextLinePosition + 2);
                     innerExpressions.Add(returnExpression);
                     _expressionsByDepth.Pop();
                     return (new FunctionExpression(innerExpressions, arguments, functionName), nextTokenPosition);
