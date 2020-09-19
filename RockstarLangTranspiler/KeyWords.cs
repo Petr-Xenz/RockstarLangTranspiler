@@ -157,7 +157,7 @@ namespace RockstarLangTranspiler
 
         public const string Taking = "taking";
 
-        public const string Gives = "gives";
+        public const string Give = "give";
 
         public const string Back = "back";
 

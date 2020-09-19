@@ -6,7 +6,7 @@ namespace RockstarLangTranspiler.Tokens.TokenFactories
     public class FunctionReturnTokenFactory : KeyWordBasedTokenFactory<FunctionReturnToken>
     {
 
-        private static string[] _keyWords = new[] { Gives, Back };
+        private static string[] _keyWords = new[] { Give, Back };
 
         public override IReadOnlyCollection<string> KeyWords => _keyWords;
 

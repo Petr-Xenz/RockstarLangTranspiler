@@ -42,6 +42,8 @@ namespace RockstarLangTranspiler
                 NotEqualExpression notEqual => CreateNotEqualExpression(notEqual),
                 GreaterThanExpression greaterThan => CreateGreaterThanExpression(greaterThan),
                 LessThanExpression lessThan => CreateLessThanExpression(lessThan),
+                StringExpression stringExpression => $"\"{stringExpression.Value}\"",
+                null => string.Empty,
                 _ => throw new NotSupportedException(expression.GetType().FullName)
             };
         }
