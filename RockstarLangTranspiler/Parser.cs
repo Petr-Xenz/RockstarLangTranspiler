@@ -568,9 +568,10 @@ namespace RockstarLangTranspiler
                 }
                 else
                 {
-                    var (functionExpression, _) = CreateExpressionBranch(nextLinePosition);
-                    innerExpressions.Add(functionExpression);
-                    nextLinePosition = GetNextLinePosition(nextLinePosition);
+                    var (functionExpression, nextToken) = CreateExpressionBranch(nextLinePosition);
+                    if (functionExpression is not null)
+                        innerExpressions.Add(functionExpression);
+                    nextLinePosition = nextToken;
                 }
             }
 
