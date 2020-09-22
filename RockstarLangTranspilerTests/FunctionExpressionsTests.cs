@@ -166,6 +166,36 @@ namespace RockstarLangTranspilerTests
             Assert.IsTrue(fe.InnerExpressions.First() is OutputExpression);
             Assert.IsTrue(fe.InnerExpressions.Last() is ConstantExpression);
         }
+
+        [TestMethod]
+        public void ParseFunctionWithInnerWhile()
+        {
+            var src = @"Midnight takes your heart and your soul
+While your heart is as high as your soul
+Put your heart without your soul into your heart
+
+Give back your heart";
+
+            var tokens = new Lexer(src).Lex();
+            var syntaxTree = new Parser(tokens).Parse();
+
+            Assert.AreEqual(1, syntaxTree.RootExpressions.Count());
+            var fe = syntaxTree.RootExpressions.Single() as FunctionExpression;
+
+            Assert.IsNotNull(fe);
+            var args = fe.Arguments.ToArray();
+            Assert.AreEqual(2, args.Length);
+            Assert.AreEqual("your_heart", args[0].Name);
+            Assert.AreEqual("your_soul", args[1].Name);
+
+            Assert.AreEqual(2, fe.InnerExpressions.Count());
+            var we = fe.InnerExpressions.First() as WhileExpression;
+            var re = fe.InnerExpressions.Last() as VariableExpression;
+
+            Assert.IsNotNull(we);
+            Assert.IsNotNull(re);
+
+        }
     }
 
 }

@@ -579,15 +579,19 @@ namespace RockstarLangTranspiler
 
             IEnumerable<FunctionArgument> SelectArgumentsFromLine(int position)
             {
-                while (_tokens.Length < position || !(_tokens[position] is EndOfTheLineToken))
+                var startPosition = position;
+                var nextLinePosition = GetNextLinePosition(startPosition);
+
+                for (; position < nextLinePosition; position++)
                 {
-                    var token = _tokens[position];
-                    position++;
-                    if (token is WordToken)
+                    var token = PeekToken(position);
+                    if (token.CanBeArgumentSeparator() || token is EndOfTheLineToken)
                     {
-                        yield return new FunctionArgument(token.Value);
+                        var argTokens = _tokens[startPosition..position].ToArray();
+                        yield return new FunctionArgument(argTokens.Select(t => t.Value).Aggregate((p, c) => $"{p}_{c}"));
+                        startPosition = position + 1;
                     }
-                }
+                }                
             }
         }
 
