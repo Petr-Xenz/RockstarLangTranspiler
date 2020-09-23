@@ -16,7 +16,7 @@ namespace RockstarLangTranspilerTests
             {
                 new CommonVariablePrefixToken(0, 0, "a"),
                 new WordToken(0, 0, "boy"),
-                new AssigmentToken(0, 0, "is"),
+                new IsToken(0, 0, "is"),
                 new UndefinedToken(0, 0, "mysterious"),
                 new EndOfTheLineToken(0, 0),
             };

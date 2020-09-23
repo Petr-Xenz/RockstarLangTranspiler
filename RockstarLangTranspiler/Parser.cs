@@ -495,9 +495,9 @@ namespace RockstarLangTranspiler
 
             var tokenAfterVariable = PeekNextToken(currentTokenPosition + 1);
 
-            return tokenAfterVariable switch
+            return (tokenAfterVariable, _isInConditionParsingContext) switch
             {
-                AssigmentToken { Value: Is } => CreateSimpleAssigment(CreateCommonVariable(currentTokenPosition).expression, currentTokenPosition + 2),
+                (IsToken { Value: Is }, false) => CreateSimpleAssigment(CreateCommonVariable(currentTokenPosition).expression, currentTokenPosition + 2),
                 _ => CreateCommonVariable(currentTokenPosition),
             };
         }
