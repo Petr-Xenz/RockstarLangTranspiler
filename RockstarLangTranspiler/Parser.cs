@@ -65,7 +65,7 @@ namespace RockstarLangTranspiler
                 WhileToken _ => CreateWhileExpression(currentTokenPosition),
                 ContinueToken _ => CreateContinueExpressions(currentTokenPosition),
                 BreakToken _ => CreateBreakExpression(currentTokenPosition),
-                IsToken _ => CreateComparsionExpression(currentTokenPosition),
+                IsToken _ => ParseExpressionBasedOnConditionalState(currentTokenPosition),
                 NotEqualsToken _ => CreateCompoundExpression((l, r) => new NotEqualExpression(l, r), currentTokenPosition),
                 AndToken _ => CreateExpressionBranch(currentTokenPosition + 1),
                 CommaToken _ => CreateExpressionBranch(currentTokenPosition + 1),
@@ -379,27 +379,29 @@ namespace RockstarLangTranspiler
 
         private (IExpression expression, int nextTokenPosition) ParseWordToken(int currentTokenPosition)
         {
-            var token = _tokens[currentTokenPosition];
             var nextToken = PeekNextToken(currentTokenPosition);
-            var result = nextToken switch
-            {
-                IsToken _ => ParseExpressionBasedOnConditionalState(currentTokenPosition),
-                FunctionDeclarationToken _ => CreateFunctionExpression(currentTokenPosition),
-                FunctionInvocationToken _ => CreateFunctionInvocationExpression(currentTokenPosition),
+            var previousToken = PeekPreviousToken(currentTokenPosition);
 
-                WordToken { IsStartingWithUpper: true } _ => CreateVaraibleExpression(currentTokenPosition),
-                WordToken { IsStartingWithUpper: false } _ => CreatePoeticLiteralExpression(currentTokenPosition),
-                _ => CreateSimpleVariableExpression(token, currentTokenPosition),
+            var result = (nextToken, previousToken) switch
+            {
+                (IsToken _, _) => ParseExpressionBasedOnConditionalState(currentTokenPosition),
+                (FunctionDeclarationToken _, _) => CreateFunctionExpression(currentTokenPosition),
+                (FunctionInvocationToken _, _) => CreateFunctionInvocationExpression(currentTokenPosition),
+                
+                (WordToken { IsStartingWithUpper: true } _, _) => CreateVaraibleExpression(currentTokenPosition),
+                (WordToken { IsStartingWithUpper: false } _, _) => CreatePoeticLiteralExpression(currentTokenPosition),
+                (EndOfTheLineToken _, IsToken _) => CreatePoeticLiteralExpression(currentTokenPosition),
+                _ => CreateSimpleVariableExpression(currentTokenPosition),
             };
 
             return result;
+        }
 
-            (IExpression expression, int nextTokenPosition) ParseExpressionBasedOnConditionalState(int currentTokenPosition)
-            {
-                return _isInConditionParsingContext
-                    ? CreateComparsionExpression(currentTokenPosition)
-                    : CreateSimpleAssigment(CreateSimpleVariableExpression(token, currentTokenPosition).expression, currentTokenPosition + 1);
-            }
+        private (IExpression expression, int nextTokenPosition) ParseExpressionBasedOnConditionalState(int currentTokenPosition)
+        {
+            return _isInConditionParsingContext
+                ? CreateComparsionExpression(currentTokenPosition)
+                : CreateSimpleAssigment(CreateSimpleVariableExpression(currentTokenPosition).expression, currentTokenPosition + 1);
         }
 
         private (IExpression expression, int nextTokenPosition) CreateComparsionExpression(int currentTokenPosition)
@@ -456,8 +458,8 @@ namespace RockstarLangTranspiler
             return (new VariableAssigmentExpression(variableExpression, expression), nextTokenPosition);
         }
 
-        private static (VariableExpression expression, int nextTokenPosition) CreateSimpleVariableExpression(Token token, int currentTokenPosition)
-            => (new VariableExpression(token.Value), currentTokenPosition + 1);
+        private (VariableExpression expression, int nextTokenPosition) CreateSimpleVariableExpression(int currentTokenPosition)
+            => (new VariableExpression(PeekToken(currentTokenPosition).Value), currentTokenPosition + 1);
 
         private (VariableExpression expression, int nextTokenPosition) CreateVaraibleExpression(int currentTokenPosition)
         {
@@ -468,7 +470,7 @@ namespace RockstarLangTranspiler
             {
                 (CommonVariablePrefixToken _, WordToken _) => CreateCommonVariable(currentTokenPosition),
                 (WordToken { IsStartingWithUpper: true } _, WordToken { IsStartingWithUpper: true } _) => CreateProperVariable(currentTokenPosition),
-                (WordToken word, _) => CreateSimpleVariableExpression(word, currentTokenPosition),
+                (WordToken _, _) => CreateSimpleVariableExpression(currentTokenPosition),
                 _ => throw new UnexpectedTokenException(currentToken.GetType().ToString()),
             };
         }
@@ -613,7 +615,7 @@ namespace RockstarLangTranspiler
 
         private Token PeekToken(int currentTokenPosition)
         {
-            return currentTokenPosition + 1 >= _tokens.Length
+            return currentTokenPosition >= _tokens.Length
                 ? new EndOfFileToken(currentTokenPosition, _tokens.Last().LineNumber + 1)
                 : _tokens[currentTokenPosition];
         }
@@ -623,6 +625,13 @@ namespace RockstarLangTranspiler
             return currentTokenPosition + 1 >= _tokens.Length
                 ? new EndOfFileToken(currentTokenPosition + 1, _tokens.Last().LineNumber + 1)
                 : _tokens[currentTokenPosition + 1];
+        }
+
+        private Token PeekPreviousToken(int currentTokenPosition)
+        {
+            return currentTokenPosition <= 0
+                ? new EndOfTheLineToken(0, 0)
+                : _tokens[currentTokenPosition - 1];
         }
 
         private IExpression PopLastExpressionFromCurrentTreeLevel()

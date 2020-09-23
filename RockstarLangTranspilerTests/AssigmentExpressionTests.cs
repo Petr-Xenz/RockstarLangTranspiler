@@ -83,6 +83,36 @@ namespace RockstarLangTranspilerTests
         }
 
         [TestMethod]
+        public void AssignSingleWordPoeticLiteral()
+        {
+            var src = "Hate is fire";
+            var tokens = new Lexer(src).Lex();
+            var syntaxTree = new Parser(tokens).Parse();
+
+            Assert.AreEqual(1, syntaxTree.RootExpressions.Count());
+            Assert.IsTrue(syntaxTree.RootExpressions.Single() is VariableAssigmentExpression);
+            var e = syntaxTree.RootExpressions.Single() as VariableAssigmentExpression;
+
+            Assert.AreEqual("Hate", e.Variable.VariableName);
+            Assert.IsTrue(e.AssigmentExpression is ConstantExpression c && c.Value == 4f);
+        }
+
+        [TestMethod]
+        public void AssignPropertVariableSingleWordPoeticLiteral()
+        {
+            var src = "Your hate is fire";
+            var tokens = new Lexer(src).Lex();
+            var syntaxTree = new Parser(tokens).Parse();
+
+            Assert.AreEqual(1, syntaxTree.RootExpressions.Count());
+            Assert.IsTrue(syntaxTree.RootExpressions.Single() is VariableAssigmentExpression);
+            var e = syntaxTree.RootExpressions.Single() as VariableAssigmentExpression;
+
+            Assert.AreEqual("Your_hate", e.Variable.VariableName);
+            Assert.IsTrue(e.AssigmentExpression is ConstantExpression c && c.Value == 4f);
+        }
+
+        [TestMethod]
         public void PutAssignFullVariablesWithCompoundExpressionOnThem()
         {
             var src = "Put your heart without your soul into your heart";
