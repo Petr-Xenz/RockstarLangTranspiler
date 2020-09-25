@@ -16,7 +16,8 @@ namespace RockstarLangTranspiler
         private readonly Dictionary<(int linePosition, int lineNumber), IExpression> _tokenPositionToExpression = new Dictionary<(int, int), IExpression>();
         private readonly Stack<IList<IExpression>> _expressionsByDepth = new Stack<IList<IExpression>>();
 
-        private bool _isInConditionParsingContext = false;
+        private bool _isInConditionParsingContext;
+        private bool _isInFunctionArgumentsContext;
 
         public Parser(IEnumerable<Token> tokens)
         {
@@ -65,7 +66,7 @@ namespace RockstarLangTranspiler
                 WhileToken _ => CreateWhileExpression(currentTokenPosition),
                 ContinueToken _ => CreateContinueExpressions(currentTokenPosition),
                 BreakToken _ => CreateBreakExpression(currentTokenPosition),
-                IsToken _ => ParseExpressionBasedOnConditionalState(currentTokenPosition),
+                IsToken _ => ParseExpressionBasedOnState(currentTokenPosition),
                 NotEqualsToken _ => CreateCompoundExpression((l, r) => new NotEqualExpression(l, r), currentTokenPosition),
                 AndToken _ => CreateExpressionBranch(currentTokenPosition + 1),
                 CommaToken _ => CreateExpressionBranch(currentTokenPosition + 1),
@@ -384,7 +385,7 @@ namespace RockstarLangTranspiler
 
             var result = (nextToken, previousToken) switch
             {
-                (IsToken _, _) => ParseExpressionBasedOnConditionalState(currentTokenPosition),
+                (IsToken _, _) => ParseExpressionBasedOnState(currentTokenPosition),
                 (FunctionDeclarationToken _, _) => CreateFunctionExpression(currentTokenPosition),
                 (FunctionInvocationToken _, _) => CreateFunctionInvocationExpression(currentTokenPosition),
                 
@@ -397,11 +398,15 @@ namespace RockstarLangTranspiler
             return result;
         }
 
-        private (IExpression expression, int nextTokenPosition) ParseExpressionBasedOnConditionalState(int currentTokenPosition)
+        private (IExpression expression, int nextTokenPosition) ParseExpressionBasedOnState(int currentTokenPosition)
         {
-            return _isInConditionParsingContext
-                ? CreateComparsionExpression(currentTokenPosition)
-                : CreateSimpleAssigment(CreateSimpleVariableExpression(currentTokenPosition).expression, currentTokenPosition + 1);
+            return (_isInConditionParsingContext, _isInFunctionArgumentsContext) switch
+            {
+                (true, false) => CreateComparsionExpression(currentTokenPosition),
+                (false, true) => CreateSimpleVariableExpression(currentTokenPosition),
+                (true, true) => throw new UnexpectedTokenException(),
+                _ => CreateSimpleAssigment(CreateSimpleVariableExpression(currentTokenPosition).expression, currentTokenPosition + 1),
+            };
         }
 
         private (IExpression expression, int nextTokenPosition) CreateComparsionExpression(int currentTokenPosition)
@@ -515,9 +520,17 @@ namespace RockstarLangTranspiler
         private (IExpression, int) CreateFunctionInvocationExpression(int currentTokenPosition)
         {
             var functionName = _tokens[currentTokenPosition].Value;
-            var (arguments, nextTokenPosition) = SelectArgumentExpressionsFromLine(currentTokenPosition + 2);
 
-            return (new FunctionInvocationExpression(arguments, functionName), nextTokenPosition);
+            try
+            {
+                _isInFunctionArgumentsContext = true;
+                var (arguments, nextTokenPosition) = WithConditionParsingState(() => SelectArgumentExpressionsFromLine(currentTokenPosition + 2), false);
+                return (new FunctionInvocationExpression(arguments, functionName), nextTokenPosition);
+            }
+            finally
+            {
+                _isInFunctionArgumentsContext = false;
+            }
 
             (IEnumerable<IExpression> expression, int nextTokenPosition) SelectArgumentExpressionsFromLine(int tokenPosition)
             {
@@ -527,6 +540,9 @@ namespace RockstarLangTranspiler
                 while (CanParseArgumentsFarther(nextToken))
                 {
                     var (argumentExpression, nextTokenPosition) = CreateExpressionBranch(tokenPosition);
+                    if (PeekToken(nextTokenPosition).CanBeArgumentSeparator())
+                        nextTokenPosition++;
+
                     tokenPosition = nextTokenPosition;
                     nextToken = _tokens[tokenPosition];
                     if (argumentExpression is null)
@@ -542,6 +558,7 @@ namespace RockstarLangTranspiler
                     return token switch
                     {
                         AssigmentToken _ => false,
+                        IsToken _ => false,
                         EndOfTheLineToken _ => false,
                         EndOfFileToken _ => false,
                         _ => true,
@@ -550,12 +567,25 @@ namespace RockstarLangTranspiler
             }
         }
 
+        private T WithConditionParsingState<T>(Func<T> func, bool state)
+        {
+            var current = _isInConditionParsingContext;
+            try
+            {
+                _isInConditionParsingContext = state;
+                return func();
+            }
+            finally
+            {
+                _isInConditionParsingContext = current;
+            }
+        }
+
         private (IExpression, int) CreateFunctionExpression(int currentTokenPosition)
         {
             var functionName = _tokens[currentTokenPosition].Value;
             var arguments = SelectArgumentsFromLine(currentTokenPosition + 2);
             var nextLinePosition = GetNextLinePosition(currentTokenPosition);
-
             var innerExpressions = new List<IExpression>();
             _expressionsByDepth.Push(innerExpressions);
             while (_tokens[nextLinePosition] is not EndOfFileToken)
@@ -576,25 +606,32 @@ namespace RockstarLangTranspiler
                     nextLinePosition = nextToken;
                 }
             }
-
             _expressionsByDepth.Pop();
             throw new InvalidOperationException("Function does not return");
 
             IEnumerable<FunctionArgument> SelectArgumentsFromLine(int position)
             {
-                var startPosition = position;
-                var nextLinePosition = GetNextLinePosition(startPosition);
-
-                for (; position < nextLinePosition; position++)
+                _isInFunctionArgumentsContext = true;
+                try
                 {
-                    var token = PeekToken(position);
-                    if (token.CanBeArgumentSeparator() || token is EndOfTheLineToken)
+                    var startPosition = position;
+                    var nextLinePosition = GetNextLinePosition(startPosition);
+
+                    for (; position < nextLinePosition; position++)
                     {
-                        var argTokens = _tokens[startPosition..position].ToArray();
-                        yield return new FunctionArgument(argTokens.Select(t => t.Value).Aggregate((p, c) => $"{p}_{c}"));
-                        startPosition = position + 1;
+                        var token = PeekToken(position);
+                        if (token.CanBeArgumentSeparator() || token is EndOfTheLineToken)
+                        {
+                            var argTokens = _tokens[startPosition..position].ToArray();
+                            yield return new FunctionArgument(argTokens.Select(t => t.Value).Aggregate((p, c) => $"{p}_{c}"));
+                            startPosition = position + 1;
+                        }
                     }
-                }                
+                }
+                finally
+                {
+                    _isInFunctionArgumentsContext = false;
+                }            
             }
         }
 

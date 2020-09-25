@@ -191,5 +191,15 @@ namespace RockstarLangTranspilerTests
             Assert.IsNotNull(elseExpressions.First() as OutputExpression);
             Assert.IsNotNull(elseExpressions.Last() as OutputExpression);
         }
+
+        [TestMethod]
+        public void IfWithComplexConditionExpression()
+        {
+            var src = @"If Midnight taking my world, Fire is nothing and Midnight taking my world, Hate is nothing
+Shout ""FizzBuzz!""";
+
+            var tokens = new Lexer(src).Lex();
+            var syntaxTree = new Parser(tokens).Parse();
+        }
     }
 }
