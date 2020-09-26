@@ -70,6 +70,14 @@ namespace RockstarLangTranspiler
 
         #endregion
 
+        #region Logical operations
+
+        public const string Or = "or";
+
+        public const string Nor = "nor";
+
+        #endregion
+
         public const string And = "and";
 
         public const string Not = "not";

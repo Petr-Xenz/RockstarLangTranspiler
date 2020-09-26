@@ -2,6 +2,7 @@
 using RockstarLangTranspiler;
 using RockstarLangTranspiler.Expressions;
 using RockstarLangTranspiler.Tokens;
+using System;
 using System.Linq;
 
 namespace RockstarLangTranspilerTests
@@ -200,6 +201,24 @@ Shout ""FizzBuzz!""";
 
             var tokens = new Lexer(src).Lex();
             var syntaxTree = new Parser(tokens).Parse();
+
+            Assert.AreEqual(1, syntaxTree.RootExpressions.Count());
+            var ifExpr = syntaxTree.RootExpressions.Single() as IfExpression;
+
+            var conjExpr = ifExpr.ConditionExpression as ConjunctionExpression;
+            Assert.IsNotNull(conjExpr);
+
+            var leftConj = conjExpr.Left as EqualityExpression;
+            var rightConj = conjExpr.Right as EqualityExpression;
+
+            Assert.IsNotNull(leftConj);
+            Assert.IsNotNull(rightConj);
+
+            Assert.IsTrue(leftConj.Left is FunctionInvocationExpression);
+            Assert.IsTrue(leftConj.Right is NullExpression);
+
+            Assert.IsTrue(rightConj.Left is FunctionInvocationExpression);
+            Assert.IsTrue(rightConj.Right is NullExpression);
         }
     }
 }

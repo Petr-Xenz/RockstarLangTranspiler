@@ -68,9 +68,9 @@ namespace RockstarLangTranspiler
                 BreakToken _ => CreateBreakExpression(currentTokenPosition),
                 IsToken _ => ParseExpressionBasedOnState(currentTokenPosition),
                 NotEqualsToken _ => CreateCompoundExpression((l, r) => new NotEqualExpression(l, r), currentTokenPosition),
-                AndToken _ => CreateExpressionBranch(currentTokenPosition + 1),
-                CommaToken _ => CreateExpressionBranch(currentTokenPosition + 1),
-                FunctionArgumentSeparatorToken _ => CreateExpressionBranch(currentTokenPosition + 1),
+                AndToken _ => CreateCompoundExpression((l, r) => new ConjunctionExpression(l, r), currentTokenPosition),
+                DisjunctionToken _ => CreateCompoundExpression((l, r) => new DisjunctionExpression(l, r), currentTokenPosition),
+                JointDenialToken _ => CreateCompoundExpression((l, r) => new JointDenialExpression(l, r), currentTokenPosition),
                 CommonVariablePrefixToken _ => ParseCommonVariable(currentTokenPosition),
                 CommentToken { IsCommentStart: true} _ => SkipComment(currentTokenPosition + 1),
                 QuoteToken _ => CreateStringExpression(currentTokenPosition),
@@ -209,7 +209,7 @@ namespace RockstarLangTranspiler
         private (T, int) CreateCompoundExpression<T>(Func<IExpression, IExpression, T> ctor, int currentTokenPosition)
         {
             var left = PopLastExpressionFromCurrentTreeLevel();
-            var (right, next) = CreateExpressionBranch(currentTokenPosition + 1);
+            var (right, next) = CreateExpressionWithBacktracking(currentTokenPosition + 1);
             return (ctor(left, right), next);
         }
 
@@ -312,7 +312,14 @@ namespace RockstarLangTranspiler
             do
             {
                 (expression, nextTokenPosition) = CreateExpressionBranch(nextTokenPosition);
-                expressions.Add(expression);
+                if (expression is not null)
+                {
+                    expressions.Add(expression);
+                }
+                else
+                {
+                    expression = expressions.Last();
+                }
             }
             while (!PeekToken(nextTokenPosition).EndsBackTracking());            
             
@@ -459,7 +466,7 @@ namespace RockstarLangTranspiler
 
         private (IExpression expression, int nextTokenPosition) CreateSimpleAssigment(VariableExpression variableExpression, int assigmentTokenPosition)
         {
-            var (expression, nextTokenPosition) = CreateExpressionBranch(assigmentTokenPosition + 1);
+            var (expression, nextTokenPosition) = CreateExpressionWithBacktracking(assigmentTokenPosition + 1);
             return (new VariableAssigmentExpression(variableExpression, expression), nextTokenPosition);
         }
 

@@ -31,10 +31,10 @@ namespace RockstarLangTranspilerTests
             Assert.IsTrue(syntaxTree.RootExpressions.Single() is AdditionExpression);
             var a = syntaxTree.RootExpressions.Single() as AdditionExpression;
 
-            Assert.IsTrue(a.Right is ConstantExpression);
-            Assert.IsTrue(a.Left is AdditionExpression);
+            Assert.IsTrue(a.Left is ConstantExpression);
+            Assert.IsTrue(a.Right is AdditionExpression);
 
-            var secondAddition = a.Left as AdditionExpression;
+            var secondAddition = a.Right as AdditionExpression;
             Assert.IsTrue(secondAddition.Left is ConstantExpression);
             Assert.IsTrue(secondAddition.Right is ConstantExpression);
         }
@@ -61,10 +61,10 @@ namespace RockstarLangTranspilerTests
             Assert.IsTrue(syntaxTree.RootExpressions.Single() is SubtractionExpression);
             var s = syntaxTree.RootExpressions.Single() as SubtractionExpression;
 
-            Assert.IsTrue(s.Right is ConstantExpression);
-            Assert.IsTrue(s.Left is SubtractionExpression);
+            Assert.IsTrue(s.Left is ConstantExpression);
+            Assert.IsTrue(s.Right is SubtractionExpression);
 
-            var secondSubtraction = s.Left as SubtractionExpression;
+            var secondSubtraction = s.Right as SubtractionExpression;
             Assert.IsTrue(secondSubtraction.Left is ConstantExpression);
             Assert.IsTrue(secondSubtraction.Right is ConstantExpression);
         }
@@ -91,10 +91,10 @@ namespace RockstarLangTranspilerTests
             Assert.IsTrue(syntaxTree.RootExpressions.Single() is MultiplicationExpression);
             var m = syntaxTree.RootExpressions.Single() as MultiplicationExpression;
 
-            Assert.IsTrue(m.Right is ConstantExpression);
-            Assert.IsTrue(m.Left is MultiplicationExpression);
+            Assert.IsTrue(m.Left is ConstantExpression);
+            Assert.IsTrue(m.Right is MultiplicationExpression);
 
-            var second = m.Left as MultiplicationExpression;
+            var second = m.Right as MultiplicationExpression;
             Assert.IsTrue(second.Left is ConstantExpression);
             Assert.IsTrue(second.Right is ConstantExpression);
         }
@@ -121,10 +121,10 @@ namespace RockstarLangTranspilerTests
             Assert.IsTrue(syntaxTree.RootExpressions.Single() is DivisionExpression);
             var d = syntaxTree.RootExpressions.Single() as DivisionExpression;
 
-            Assert.IsTrue(d.Right is ConstantExpression);
-            Assert.IsTrue(d.Left is DivisionExpression);
+            Assert.IsTrue(d.Left is ConstantExpression);
+            Assert.IsTrue(d.Right is DivisionExpression);
 
-            var second = d.Left as DivisionExpression;
+            var second = d.Right as DivisionExpression;
             Assert.IsTrue(second.Left is ConstantExpression);
             Assert.IsTrue(second.Right is ConstantExpression);
         }
