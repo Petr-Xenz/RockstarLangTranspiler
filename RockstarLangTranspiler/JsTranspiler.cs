@@ -43,10 +43,22 @@ namespace RockstarLangTranspiler
                 GreaterThanExpression greaterThan => CreateGreaterThanExpression(greaterThan),
                 LessThanExpression lessThan => CreateLessThanExpression(lessThan),
                 StringExpression stringExpression => $"\"{stringExpression.Value}\"",
+                ConjunctionExpression conjunction => CreateConjunctionExpression(conjunction),
+                DisjunctionExpression disjunction => CreateDisjunctionExpression(disjunction),
+                JointDenialExpression jointDenial => CreateJointDenialExpression(jointDenial),
                 null => string.Empty,
                 _ => throw new NotSupportedException(expression.GetType().FullName)
             };
         }
+
+        private string CreateJointDenialExpression(JointDenialExpression jointDenial) 
+            => $"{TranspileExpression(jointDenial.Left)} ^ {TranspileExpression(jointDenial.Right)}";
+
+        private string CreateDisjunctionExpression(DisjunctionExpression disjunction)
+            => $"{TranspileExpression(disjunction.Left)} || {TranspileExpression(disjunction.Right)}";
+
+        private string CreateConjunctionExpression(ConjunctionExpression conjunction)
+            => $"{TranspileExpression(conjunction.Left)} && {TranspileExpression(conjunction.Right)}";
 
         private string CreateDecrementExpression(DecrementExpression decrement) => $"{decrement.Variable.VariableName}--";
 

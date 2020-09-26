@@ -421,6 +421,42 @@ namespace RockstarLangTranspilerTests
 
             Assert.AreEqual(expected.RemoveNonPrintableChras(), result.RemoveNonPrintableChras());
         }
+
+        [TestMethod]
+        public void TranspileConjunctionExpression()
+        {
+            var src = "Fire and Ice";
+            var tree = new Parser(new Lexer(src).Lex()).Parse();
+
+            var result = new JsTranspiler().Transpile(tree);
+            var expected = "Fire && Ice";
+
+            Assert.AreEqual(expected.RemoveNonPrintableChras(), result.RemoveNonPrintableChras());
+        }
+
+        [TestMethod]
+        public void TranspileDisjunctionExpression()
+        {
+            var src = "Fire or Ice";
+            var tree = new Parser(new Lexer(src).Lex()).Parse();
+
+            var result = new JsTranspiler().Transpile(tree);
+            var expected = "Fire || Ice";
+
+            Assert.AreEqual(expected.RemoveNonPrintableChras(), result.RemoveNonPrintableChras());
+        }
+
+        [TestMethod]
+        public void TranspileJointDenialExpression()
+        {
+            var src = "Fire nor Ice";
+            var tree = new Parser(new Lexer(src).Lex()).Parse();
+
+            var result = new JsTranspiler().Transpile(tree);
+            var expected = "Fire ^ Ice";
+
+            Assert.AreEqual(expected.RemoveNonPrintableChras(), result.RemoveNonPrintableChras());
+        }
     }  
 
     public static class Extensions
